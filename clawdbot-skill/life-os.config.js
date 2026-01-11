@@ -51,48 +51,39 @@ export const config = {
   },
 
   // Trigger Keywords - messages containing these route to Life OS
+  // SECURITY NOTE: Only content/research goes to AWS
+  // Finance, health, HR stay LOCAL on your VPS (handled by Clawdbot directly)
   triggers: {
-    // Content creation keywords
+    // Content creation keywords → AWS
     content: [
-      'write', 'create', 'draft', 'compose', 'blog', 'article',
-      'post', 'content', 'copy', 'script', 'outline'
+      'write a', 'write me', 'create a', 'draft a', 'compose', 'blog post', 'article',
+      'write content', 'copy for', 'script for', 'outline for', 'newsletter'
     ],
 
-    // Research keywords
+    // Research keywords → AWS
     research: [
-      'research', 'analyze', 'investigate', 'study', 'find',
-      'search', 'lookup', 'pubmed', 'papers', 'literature'
+      'research about', 'research on', 'analyze this topic', 'investigate',
+      'pubmed', 'scientific papers', 'literature review', 'find studies'
     ],
 
-    // Social media keywords
+    // Social media content keywords → AWS
     social: [
-      'twitter', 'tweet', 'x post', 'linkedin', 'social',
-      'thread', 'viral', 'engagement'
+      'twitter thread', 'tweet about', 'linkedin post', 'social media post',
+      'viral content', 'engagement post'
     ],
 
-    // Finance keywords
-    finance: [
-      'finance', 'loan', 'mortgage', 'investment', 'budget',
-      'expense', 'income', 'tax', 'savings', 'portfolio'
+    // Graphics/infographic keywords → AWS
+    graphics: [
+      'infographic', 'create chart', 'visualize', 'diagram for'
     ],
 
-    // HR keywords
-    hr: [
-      'hr', 'human resources', 'employee', 'hiring', 'recruit',
-      'onboard', 'payroll', 'benefits', 'performance'
-    ],
-
-    // Health keywords
-    health: [
-      'health', 'medical', 'doctor', 'appointment', 'medication',
-      'wellness', 'fitness', 'nutrition', 'symptom'
-    ],
-
-    // Task management keywords
-    tasks: [
-      'task', 'todo', 'schedule', 'calendar', 'reminder',
-      'deadline', 'project', 'milestone'
-    ],
+    // =================================================================
+    // EXCLUDED FROM AWS - These stay on your VPS with Firefly/Clawdbot:
+    // - finance, expense, budget, loan, tax (→ Firefly III)
+    // - health, medical, appointment (→ Local)
+    // - hr, employee, payroll (→ Local)
+    // - task, todo, reminder, calendar (→ Local)
+    // =================================================================
   },
 
   // Response formatting
