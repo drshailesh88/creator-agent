@@ -1,0 +1,232 @@
+{
+  "name": "life-os",
+  "version": "1.0.0",
+  "description": "Personal life management - brain dumps, reviews, habits",
+  "author": "Clawdbot",
+  "license": "MIT",
+  "mcp": {
+    "server": {
+      "name": "life-os-mcp",
+      "version": "1.0.0",
+      "description": "MCP server for Life OS personal management tools"
+    },
+    "tools": [
+      {
+        "name": "process_brain_dump",
+        "description": "Process unstructured thoughts into organized, actionable items. Be gentle and non-judgmental with the output.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "raw_thoughts": {
+              "type": "string",
+              "description": "Stream of consciousness text to organize"
+            }
+          },
+          "required": ["raw_thoughts"]
+        },
+        "handler": "brain_dump.process_brain_dump"
+      },
+      {
+        "name": "generate_briefing",
+        "description": "Generate a personalized daily briefing with calendar, priorities, and habit reminders. Set a calm, grounding tone.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "format": "date",
+              "description": "Date for briefing (ISO format, default: today)"
+            }
+          },
+          "required": []
+        },
+        "handler": "daily_briefing.generate_briefing"
+      },
+      {
+        "name": "generate_weekly_review",
+        "description": "Generate a weekly review with wins, lessons, and next week focus. Be encouraging and celebratory.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "week": {
+              "type": "string",
+              "format": "date",
+              "description": "Any date within the target week (ISO format, default: current week)"
+            },
+            "wins": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "description": {"type": "string"},
+                  "category": {"type": "string"},
+                  "impact": {"type": "string"}
+                },
+                "required": ["description"]
+              },
+              "description": "List of wins/accomplishments"
+            },
+            "lessons": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "insight": {"type": "string"},
+                  "context": {"type": "string"},
+                  "action": {"type": "string"}
+                },
+                "required": ["insight"]
+              },
+              "description": "List of lessons learned"
+            },
+            "gratitude": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "List of gratitude items"
+            },
+            "next_week_focus": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "area": {"type": "string"},
+                  "why": {"type": "string"},
+                  "success_looks_like": {"type": "string"},
+                  "first_step": {"type": "string"}
+                },
+                "required": ["area"]
+              },
+              "description": "Focus areas for next week"
+            },
+            "intentions": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Intentions for next week"
+            }
+          },
+          "required": []
+        },
+        "handler": "weekly_review.generate_weekly_review"
+      },
+      {
+        "name": "log_habit",
+        "description": "Log a habit as completed or missed. Celebrate streaks and be compassionate with misses.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "habit": {
+              "type": "string",
+              "description": "Name of the habit"
+            },
+            "completed": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether the habit was completed"
+            },
+            "date": {
+              "type": "string",
+              "format": "date",
+              "description": "Date to log (ISO format, default: today)"
+            },
+            "notes": {
+              "type": "string",
+              "description": "Optional notes about the log"
+            }
+          },
+          "required": ["habit"]
+        },
+        "handler": "habit_tracker.log_habit"
+      },
+      {
+        "name": "get_habit_streak",
+        "description": "Get current streak and stats for a specific habit.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "habit": {
+              "type": "string",
+              "description": "Name of the habit"
+            }
+          },
+          "required": ["habit"]
+        },
+        "handler": "habit_tracker.get_habit_streak"
+      },
+      {
+        "name": "habit_summary",
+        "description": "Get a summary of all habits including streaks and completion rates.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "type": "integer",
+              "default": 30,
+              "description": "Number of days to include in summary"
+            }
+          },
+          "required": []
+        },
+        "handler": "habit_tracker.habit_summary"
+      }
+    ],
+    "resources": [
+      {
+        "name": "habits",
+        "description": "Access to habit definitions and logs",
+        "uri": "notion://habits"
+      },
+      {
+        "name": "daily_notes",
+        "description": "Access to daily notes and briefings",
+        "uri": "notion://daily_notes"
+      },
+      {
+        "name": "weekly_reviews",
+        "description": "Access to weekly review documents",
+        "uri": "notion://weekly_reviews"
+      },
+      {
+        "name": "brain_dumps",
+        "description": "Access to processed brain dump entries",
+        "uri": "notion://brain_dumps"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "brain_dump_intro",
+        "description": "Introduction for brain dump sessions",
+        "template": "Let's clear your mind. Just share whatever's on your mind - no need to organize, just let it flow. I'll help you make sense of it all."
+      },
+      {
+        "name": "weekly_review_intro",
+        "description": "Introduction for weekly review sessions",
+        "template": "Time for your weekly review! Let's celebrate what went well, learn from what didn't, and set intentions for the week ahead. Ready?"
+      },
+      {
+        "name": "habit_check_in",
+        "description": "Daily habit check-in prompt",
+        "template": "How did today go with your habits? Let me know which ones you completed, and remember - progress over perfection!"
+      }
+    ]
+  },
+  "config": {
+    "notion": {
+      "api_key_env": "NOTION_API_KEY",
+      "databases": {
+        "brain_dumps": "NOTION_BRAIN_DUMP_DB",
+        "daily_notes": "NOTION_DAILY_NOTES_DB",
+        "weekly_reviews": "NOTION_WEEKLY_REVIEW_DB",
+        "habits": "NOTION_HABITS_DB"
+      }
+    }
+  },
+  "personality": {
+    "tone": "warm, encouraging, supportive",
+    "guidelines": {
+      "brain_dumps": "Be gentle and non-judgmental. Acknowledge the relief of getting things out.",
+      "daily_briefings": "Be calm and grounding. Focus on what matters most.",
+      "weekly_reviews": "Be encouraging and celebratory. Highlight wins first.",
+      "habit_tracking": "Be celebratory with wins, compassionate with misses."
+    }
+  }
+}

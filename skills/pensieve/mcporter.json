@@ -1,0 +1,69 @@
+{
+  "mcpServers": {
+    "pensieve": {
+      "command": "python",
+      "args": ["pensieve.py"],
+      "cwd": "${SKILL_DIR}",
+      "env": {
+        "NOTION_API_KEY": "${NOTION_API_KEY}",
+        "NOTION_DATABASE_ID": "${PENSIEVE_DATABASE_ID}"
+      },
+      "description": "Memory palace for storing and retrieving personal thoughts via Notion",
+      "capabilities": {
+        "tools": true,
+        "resources": false,
+        "prompts": false
+      }
+    }
+  },
+  "notion": {
+    "integration_name": "Pensieve Memory Palace",
+    "required_permissions": [
+      "read_content",
+      "insert_content",
+      "update_content"
+    ],
+    "database_schema": {
+      "name": "Pensieve",
+      "properties": {
+        "Content": {
+          "type": "rich_text",
+          "description": "The memory or thought content"
+        },
+        "Timestamp": {
+          "type": "date",
+          "description": "When the memory was captured"
+        },
+        "Tags": {
+          "type": "multi_select",
+          "description": "Categories and themes"
+        },
+        "Mood": {
+          "type": "select",
+          "options": [
+            "happy",
+            "contemplative",
+            "grateful",
+            "curious",
+            "inspired",
+            "peaceful",
+            "bittersweet",
+            "determined",
+            "hopeful",
+            "reflective"
+          ]
+        },
+        "Source": {
+          "type": "select",
+          "options": [
+            "chat",
+            "reflection",
+            "journal",
+            "voice",
+            "import"
+          ]
+        }
+      }
+    }
+  }
+}

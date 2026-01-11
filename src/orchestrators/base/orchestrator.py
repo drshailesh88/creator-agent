@@ -9,6 +9,13 @@ import logging
 from enum import Enum
 
 from .agent import BaseAgent, AgentResponse
+from ...shared.llm import (
+    LLMFallbackChain,
+    Message,
+    FallbackResult,
+    LLMError,
+    SETTINGS as LLM_SETTINGS,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -168,25 +175,30 @@ class BaseOrchestrator(ABC):
     - Request routing and delegation
     - Memory management across sessions
     - Tool execution framework
-    - Uses GLM-4 as primary model
+    - Uses LLM fallback chain: GLM-4 -> Kimi K2 -> GPT-4o mini
     """
 
-    # Default model configuration
+    # Default model configuration (used as fallback if LLM module fails)
     DEFAULT_MODEL = "glm-4"
     DEFAULT_MODEL_CONFIG = {
-        "temperature": 0.7,
-        "max_tokens": 4096,
-        "top_p": 0.95,
+        "temperature": LLM_SETTINGS.default_temperature,
+        "max_tokens": LLM_SETTINGS.default_max_tokens,
+        "top_p": LLM_SETTINGS.default_top_p,
     }
 
     def __init__(
         self,
         model: str = None,
         model_config: Optional[Dict[str, Any]] = None,
-        max_memory_messages: int = 100
+        max_memory_messages: int = 100,
+        llm_chain: Optional[LLMFallbackChain] = None,
     ):
         self.model = model or self.DEFAULT_MODEL
         self.model_config = {**self.DEFAULT_MODEL_CONFIG, **(model_config or {})}
+
+        # LLM fallback chain
+        self._llm_chain = llm_chain
+        self._owns_llm_chain = llm_chain is None  # Track if we created it
 
         # Agent registry
         self._agents: Dict[str, BaseAgent] = {}
@@ -199,8 +211,107 @@ class BaseOrchestrator(ABC):
         # Tool execution
         self.tool_executor = ToolExecutor()
 
+        # Track last LLM provider used
+        self._last_llm_provider: Optional[str] = None
+        self._last_llm_model: Optional[str] = None
+
         # Initialize orchestrator-specific components
         self._initialize()
+
+    async def get_llm_chain(self) -> LLMFallbackChain:
+        """Get or create the LLM fallback chain."""
+        if self._llm_chain is None:
+            self._llm_chain = LLMFallbackChain()
+            self._owns_llm_chain = True
+        return self._llm_chain
+
+    async def llm_chat(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = None,
+        max_tokens: int = None,
+        **kwargs
+    ) -> FallbackResult:
+        """
+        Send a chat completion request using the LLM fallback chain.
+
+        This method handles the fallback logic automatically:
+        1. Try GLM-4 (Zhipu AI) - Primary
+        2. Try Kimi K2 (Moonshot AI) - Fallback 1
+        3. Try GPT-4o mini (OpenAI) - Fallback 2
+
+        Args:
+            messages: List of message dicts with 'role' and 'content'
+            temperature: Sampling temperature (optional)
+            max_tokens: Max tokens to generate (optional)
+            **kwargs: Additional provider-specific parameters
+
+        Returns:
+            FallbackResult with response and metadata about which provider was used
+        """
+        chain = await self.get_llm_chain()
+
+        # Convert dict messages to Message objects
+        msg_objects = [
+            Message(role=m["role"], content=m["content"])
+            for m in messages
+        ]
+
+        result = await chain.chat(
+            messages=msg_objects,
+            temperature=temperature or self.model_config.get("temperature"),
+            max_tokens=max_tokens or self.model_config.get("max_tokens"),
+            **kwargs
+        )
+
+        # Track which provider was used
+        self._last_llm_provider = result.provider_used
+        self._last_llm_model = result.model_used
+
+        logger.info(
+            f"LLM request completed via {result.provider_used}/{result.model_used} "
+            f"(attempts: {result.attempts}, time: {result.total_time:.2f}s)"
+        )
+
+        return result
+
+    async def llm_simple_chat(
+        self,
+        user_message: str,
+        system_prompt: Optional[str] = None,
+        **kwargs
+    ) -> str:
+        """
+        Simplified chat interface that returns just the response content.
+
+        Args:
+            user_message: The user's message
+            system_prompt: Optional system prompt
+            **kwargs: Additional parameters passed to llm_chat
+
+        Returns:
+            The response content as a string
+        """
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": user_message})
+
+        result = await self.llm_chat(messages, **kwargs)
+        return result.response.content
+
+    def get_last_llm_info(self) -> Dict[str, Optional[str]]:
+        """Get information about the last LLM provider used."""
+        return {
+            "provider": self._last_llm_provider,
+            "model": self._last_llm_model,
+        }
+
+    async def close(self) -> None:
+        """Clean up resources including LLM connections."""
+        if self._owns_llm_chain and self._llm_chain is not None:
+            await self._llm_chain.close()
+            self._llm_chain = None
 
     @abstractmethod
     def _initialize(self) -> None:
@@ -322,6 +433,9 @@ class BaseOrchestrator(ABC):
 
             execution_time = (datetime.utcnow() - start_time).total_seconds()
 
+            # Get LLM info for metadata
+            llm_info = self.get_last_llm_info()
+
             return OrchestratorResponse(
                 success=True,
                 result=agent_response.content,
@@ -330,9 +444,23 @@ class BaseOrchestrator(ABC):
                 execution_time=execution_time,
                 metadata={
                     "tools_used": agent_response.tools_used,
-                    "model": self.model,
+                    "model": llm_info.get("model") or self.model,
+                    "llm_provider": llm_info.get("provider"),
                     "session_id": session_id
                 }
+            )
+
+        except LLMError as e:
+            logger.error(f"LLM error processing request: {e}")
+            errors.append(f"LLM Error ({e.provider}/{e.model}): {e.message}")
+            execution_time = (datetime.utcnow() - start_time).total_seconds()
+
+            return OrchestratorResponse(
+                success=False,
+                result=None,
+                execution_time=execution_time,
+                errors=errors,
+                metadata={"error_type": "llm_error", "provider": e.provider}
             )
 
         except Exception as e:

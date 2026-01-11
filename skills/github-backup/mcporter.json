@@ -1,0 +1,256 @@
+{
+  "name": "github-backup",
+  "version": "1.0.0",
+  "description": "MCP tools for Pensieve GitHub backup automation",
+  "author": "Clawdbot",
+  "tools": [
+    {
+      "name": "run_backup",
+      "description": "Run an immediate backup of Pensieve to GitHub. Exports all new and modified entries as Markdown files and commits them to the configured private repository. Use this when the user wants to ensure their memories are saved right now.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "full": {
+            "type": "boolean",
+            "description": "If true, backs up all entries regardless of modification time. If false (default), only backs up entries changed since last backup.",
+            "default": false
+          }
+        },
+        "required": []
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the backup completed successfully"
+          },
+          "backed_up": {
+            "type": "integer",
+            "description": "Number of entries backed up"
+          },
+          "skipped": {
+            "type": "integer",
+            "description": "Number of unchanged entries skipped"
+          },
+          "errors": {
+            "type": "array",
+            "description": "List of any errors encountered"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "ISO timestamp of when backup completed"
+          }
+        }
+      },
+      "handler": "backup.py:PensieveBackup.run_backup"
+    },
+    {
+      "name": "get_backup_status",
+      "description": "Get the current status of the backup system, including last backup time and configuration. Use this to check when the last backup occurred or verify the system is properly configured.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "last_backup": {
+            "type": "string",
+            "description": "ISO timestamp of last successful backup, or null if never backed up"
+          },
+          "total_entries_cached": {
+            "type": "integer",
+            "description": "Number of entries tracked in the backup cache"
+          },
+          "repository": {
+            "type": "string",
+            "description": "GitHub repository being backed up to"
+          },
+          "schedule": {
+            "type": "object",
+            "description": "Current backup schedule configuration"
+          }
+        }
+      },
+      "handler": "backup.py:PensieveBackup.get_backup_status"
+    },
+    {
+      "name": "list_recent_backups",
+      "description": "List recent backup commits from the GitHub repository. Shows the history of backup operations including timestamps and what was included in each backup.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of recent backups to return",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "required": []
+      },
+      "returns": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "sha": {
+              "type": "string",
+              "description": "Short commit SHA"
+            },
+            "message": {
+              "type": "string",
+              "description": "Commit message describing the backup"
+            },
+            "date": {
+              "type": "string",
+              "description": "ISO timestamp of the commit"
+            },
+            "author": {
+              "type": "string",
+              "description": "Commit author name"
+            }
+          }
+        }
+      },
+      "handler": "backup.py:PensieveBackup.list_recent_backups"
+    },
+    {
+      "name": "set_backup_schedule",
+      "description": "Configure the automatic backup schedule. Supports preset schedules (weekly, daily, hourly) or custom cron expressions.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "schedule_type": {
+            "type": "string",
+            "enum": ["weekly", "daily", "twice_daily", "hourly", "custom"],
+            "description": "Type of schedule to set",
+            "default": "weekly"
+          },
+          "custom_cron": {
+            "type": "string",
+            "description": "Cron expression for custom schedules (e.g., '0 3 * * 0' for Sundays at 3am)"
+          }
+        },
+        "required": []
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "schedule_type": {
+            "type": "string",
+            "description": "The schedule type that was set"
+          },
+          "custom_cron": {
+            "type": "string",
+            "description": "The cron expression if custom schedule"
+          },
+          "next_run": {
+            "type": "string",
+            "description": "ISO timestamp of the next scheduled backup"
+          }
+        }
+      },
+      "handler": "scheduler.py:BackupScheduler.set_schedule"
+    },
+    {
+      "name": "get_scheduler_status",
+      "description": "Get the current status of the backup scheduler, including whether it's running and when the next backup is scheduled.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "running": {
+            "type": "boolean",
+            "description": "Whether the scheduler is currently running"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether scheduled backups are enabled"
+          },
+          "schedule_type": {
+            "type": "string",
+            "description": "Current schedule type"
+          },
+          "next_run": {
+            "type": "string",
+            "description": "ISO timestamp of next scheduled backup"
+          }
+        }
+      },
+      "handler": "scheduler.py:BackupScheduler.get_status"
+    },
+    {
+      "name": "get_backup_history",
+      "description": "Get the history of backup operations, including successes and failures. Useful for troubleshooting or verifying backups are running properly.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of history entries to return",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": []
+      },
+      "returns": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "backed_up": {
+              "type": "integer"
+            },
+            "timestamp": {
+              "type": "string"
+            },
+            "error": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "handler": "scheduler.py:BackupScheduler.get_history"
+    }
+  ],
+  "config": {
+    "required_env_vars": [
+      "NOTION_TOKEN",
+      "GITHUB_TOKEN",
+      "GITHUB_BACKUP_REPO",
+      "PENSIEVE_DATABASE_ID"
+    ],
+    "optional_env_vars": [
+      "BACKUP_SCHEDULE",
+      "BACKUP_TIMEZONE"
+    ]
+  },
+  "personality": {
+    "success_responses": [
+      "Your memories are safely backed up! All {backed_up} entries are now secure in GitHub.",
+      "Backup complete! Your Pensieve is protected - {backed_up} memories saved.",
+      "All caught up! Your thoughts and experiences are safe and sound."
+    ],
+    "error_responses": [
+      "I ran into a small hiccup while backing up, but don't worry - your existing backups are safe. Let me try again.",
+      "There was an issue connecting to {service}. Your memories in Notion are still safe - I'll retry the backup shortly."
+    ],
+    "status_responses": [
+      "Your last backup was {time_ago}. Everything looks healthy!",
+      "You have {count} memories safely backed up across {days} days of entries."
+    ]
+  }
+}

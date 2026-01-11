@@ -1,0 +1,40 @@
+{
+  "mcpServers": {
+    "notion": {
+      "command": "python3",
+      "args": ["notion_mcp.py"],
+      "cwd": "${workspaceFolder}/skills/notion",
+      "env": {
+        "NOTION_API_KEY": "${env:NOTION_API_KEY}",
+        "NOTION_DEFAULT_DATABASE_ID": "${env:NOTION_DEFAULT_DATABASE_ID}"
+      },
+      "description": "Notion integration for reading and writing to Notion databases and pages",
+      "tools": [
+        {
+          "name": "create_page",
+          "description": "Create a new page in a Notion database"
+        },
+        {
+          "name": "update_page",
+          "description": "Update an existing Notion page"
+        },
+        {
+          "name": "search_pages",
+          "description": "Search for pages in Notion"
+        },
+        {
+          "name": "get_page",
+          "description": "Get the content of a Notion page"
+        },
+        {
+          "name": "append_to_page",
+          "description": "Append content to an existing Notion page"
+        },
+        {
+          "name": "list_databases",
+          "description": "List all accessible Notion databases"
+        }
+      ]
+    }
+  }
+}

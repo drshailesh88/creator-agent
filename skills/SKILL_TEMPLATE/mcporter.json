@@ -1,0 +1,113 @@
+{
+  "$schema": "https://mcphub.io/schemas/mcporter.v1.json",
+  "name": "skill-name-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for [skill-name] integration",
+
+  "server": {
+    "command": "node",
+    "args": ["./server.js"],
+    "env": {
+      "SKILL_API_KEY": "${SKILL_API_KEY}",
+      "LOG_LEVEL": "${LOG_LEVEL:-info}"
+    }
+  },
+
+  "tools": [
+    {
+      "name": "skill_action",
+      "description": "Describe what this tool does. Be specific about inputs/outputs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "description": "The input to process"
+          },
+          "options": {
+            "type": "object",
+            "description": "Optional configuration",
+            "properties": {
+              "format": {
+                "type": "string",
+                "enum": ["json", "text", "markdown"],
+                "default": "markdown"
+              }
+            }
+          }
+        },
+        "required": ["input"]
+      }
+    }
+  ],
+
+  "resources": [
+    {
+      "name": "skill_data",
+      "description": "Access skill-related data",
+      "uriTemplate": "skill://data/{id}",
+      "mimeType": "application/json"
+    }
+  ],
+
+  "prompts": [
+    {
+      "name": "skill_prompt",
+      "description": "Guided prompt for skill usage",
+      "arguments": [
+        {
+          "name": "context",
+          "description": "Context for the prompt",
+          "required": false
+        }
+      ]
+    }
+  ],
+
+  "personality": {
+    "_comment": "CRITICAL: These settings ensure Clawdbot's personality is preserved",
+    "preserveSoulMd": true,
+    "allowPersonalityOverride": false,
+    "responseStyle": {
+      "maintainWarmth": true,
+      "useClawdbotVoice": true,
+      "friendlyErrorMessages": true
+    }
+  },
+
+  "clawdbotIntegration": {
+    "triggers": {
+      "commands": ["/skill-command"],
+      "keywords": ["keyword1", "keyword2"],
+      "patterns": ["regex pattern if needed"]
+    },
+    "priority": 50,
+    "fallbackToDefault": true
+  },
+
+  "healthCheck": {
+    "endpoint": "/health",
+    "interval": 30000,
+    "timeout": 5000
+  },
+
+  "rateLimit": {
+    "requests": 100,
+    "window": 60000
+  },
+
+  "logging": {
+    "level": "info",
+    "includeTimestamps": true,
+    "redactSecrets": true
+  },
+
+  "metadata": {
+    "author": "Your Name",
+    "repository": "https://github.com/your-org/skill-name",
+    "documentation": "https://docs.example.com/skill-name",
+    "license": "MIT",
+    "tags": ["category1", "category2"],
+    "personalitySafe": true
+  }
+}
