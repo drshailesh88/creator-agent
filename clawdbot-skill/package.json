@@ -1,0 +1,37 @@
+{
+  "name": "@clawdbot/life-os-skill",
+  "version": "1.0.0",
+  "description": "Life OS integration skill for Clawdbot - connects to AWS-hosted Life OS Master Router",
+  "type": "module",
+  "main": "life-os.js",
+  "exports": {
+    ".": "./life-os.js",
+    "./config": "./life-os.config.js"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "lint": "eslint *.js",
+    "check-health": "node -e \"import('./life-os.js').then(m => m.checkHealth().then(h => console.log('Health:', h)))\""
+  },
+  "keywords": [
+    "clawdbot",
+    "skill",
+    "life-os",
+    "integration",
+    "ai",
+    "assistant"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "peerDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}

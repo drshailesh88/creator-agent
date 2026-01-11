@@ -1,0 +1,149 @@
+# Domain Configuration for Life OS Master Router
+# Each domain defines keywords and routing rules for intent classification
+
+domains:
+  content:
+    name: "Content Creation"
+    description: "Handles content creation, writing, research, and publishing tasks"
+    endpoint: "/process"
+    keywords:
+      primary:
+        - write
+        - blog
+        - twitter
+        - tweet
+        - research
+        - article
+        - paper
+        - newsletter
+        - content
+        - draft
+        - publish
+        - post
+        - essay
+        - copy
+        - copywriting
+      secondary:
+        - edit
+        - proofread
+        - summarize
+        - outline
+        - brainstorm
+        - headline
+        - caption
+        - script
+        - story
+        - thread
+        - linkedin
+        - social media
+        - seo
+        - keywords
+    weight: 1.0
+    priority: 1
+
+  business:
+    name: "Business Operations"
+    description: "Handles HR, finance, legal, and business administration tasks"
+    endpoint: "/process"
+    keywords:
+      primary:
+        - hr
+        - finance
+        - loan
+        - invoice
+        - employee
+        - payroll
+        - budget
+        - legal
+        - contract
+        - accounting
+        - tax
+        - revenue
+        - expense
+      secondary:
+        - hire
+        - recruit
+        - salary
+        - benefits
+        - compliance
+        - policy
+        - vendor
+        - procurement
+        - quarterly
+        - report
+        - forecast
+        - profit
+        - loss
+        - audit
+        - insurance
+    weight: 1.0
+    priority: 2
+
+  personal:
+    name: "Personal Life"
+    description: "Handles health, family, scheduling, and personal development tasks"
+    endpoint: "/process"
+    keywords:
+      primary:
+        - health
+        - family
+        - schedule
+        - reminder
+        - fitness
+        - learning
+        - wellness
+        - appointment
+        - calendar
+        - workout
+        - diet
+        - sleep
+        - meditation
+      secondary:
+        - exercise
+        - gym
+        - doctor
+        - medicine
+        - habit
+        - goal
+        - personal
+        - self-improvement
+        - hobby
+        - vacation
+        - travel
+        - birthday
+        - anniversary
+        - grocery
+        - shopping
+    weight: 1.0
+    priority: 3
+
+# Cross-domain keywords that might apply to multiple domains
+cross_domain:
+  - create
+  - update
+  - delete
+  - list
+  - show
+  - find
+  - search
+  - help
+  - analyze
+  - track
+  - manage
+  - plan
+  - organize
+
+# Intent classification settings
+classification:
+  # Minimum confidence score to accept keyword match
+  min_keyword_confidence: 0.5
+
+  # Weight multipliers
+  primary_keyword_weight: 1.0
+  secondary_keyword_weight: 0.6
+
+  # If confidence is below this, use LLM fallback
+  llm_fallback_threshold: 0.7
+
+  # Maximum number of domains to consider for cross-domain requests
+  max_domains: 2

@@ -1,0 +1,74 @@
+# Life OS - Example Variables Configuration
+# Copy this file to terraform.tfvars and customize the values
+
+# AWS Region
+# The AWS region where resources will be deployed
+aws_region = "us-east-1"
+
+# EC2 Instance Type
+# Recommended: t3.medium for dev, t3.large for staging, m5.large for prod
+instance_type = "t3.medium"
+
+# NixOS AMI ID (optional)
+# Leave empty to use the latest NixOS AMI from AWS Marketplace
+# Or specify a custom AMI ID for your NixOS image
+ami_id = ""
+
+# Allowed IP Addresses
+# IMPORTANT: Restrict access to known IP addresses for security
+# Add your IP address and any other IPs that need access
+allowed_ips = [
+  # "203.0.113.50",    # Example: Your home IP
+  # "198.51.100.25",   # Example: Your office IP
+  # "192.0.2.100",     # Example: CI/CD server
+]
+
+# Domain Name (optional)
+# If you have a domain, specify it here for HTTPS configuration
+# Requires a Route53 hosted zone to be set up separately
+domain_name = ""
+
+# Environment
+# Options: dev, staging, prod
+# This affects resource naming and some security configurations
+environment = "dev"
+
+# EBS Volume Encryption
+# Recommended: true for all environments
+enable_ebs_encryption = true
+
+# Root Volume Size (GB)
+# Minimum: 20, Maximum: 1000
+root_volume_size = 50
+
+# Data Volume Size (GB)
+# Minimum: 20, Maximum: 2000
+# This is a separate volume for persistent data
+data_volume_size = 100
+
+# SSH Public Key (optional)
+# Provide your SSH public key for instance access
+# Leave empty to auto-generate a key pair (stored in SSM Parameter Store)
+# Example: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... user@example.com"
+ssh_public_key = ""
+
+# CloudWatch Detailed Monitoring
+# Provides 1-minute metrics instead of 5-minute
+# Recommended: false for dev, true for prod
+enable_detailed_monitoring = false
+
+# Backup Retention Days
+# Number of days to keep automated EBS snapshots
+# Minimum: 1, Maximum: 35
+backup_retention_days = 7
+
+# EFS Configuration
+# Enable EFS for shared storage between services
+enable_efs = true
+
+# EFS Throughput Mode
+# Options: bursting, provisioned, elastic
+# bursting: Good for most workloads, free burst credits
+# provisioned: Consistent throughput, additional cost
+# elastic: Auto-scaling throughput, pay per use
+efs_throughput_mode = "bursting"
