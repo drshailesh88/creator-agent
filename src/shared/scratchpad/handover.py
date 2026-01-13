@@ -10,20 +10,37 @@ The HandoverManager:
 2. Summarizes notes to compress information
 3. Records exact position in current document
 4. Creates a handover state that can be used to resume work
+
+Usage:
+    from shared.scratchpad import Scratchpad, HandoverManager, HandoverState
+
+    # Create a scratchpad and work on a task
+    scratchpad = Scratchpad(session_id="research-123")
+    await scratchpad.initialize()
+    session = await scratchpad.start_session(task="Research topic X", documents=[...])
+
+    # When context is full, prepare handover
+    manager = HandoverManager(scratchpad)
+    state = await manager.prepare_handover()
+    prompt = await manager.create_handover_prompt(state)
+
+    # Use prompt in the next context to resume
 """
 
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 from .models import Session, Note, Document
-from .backends.base import StorageBackend
 from .prompts import (
     HANDOVER_PROMPT,
     NOTES_SUMMARIZATION_PROMPT,
     KEY_FINDINGS_EXTRACTION_PROMPT,
 )
+
+if TYPE_CHECKING:
+    from .scratchpad import Scratchpad
 
 
 logger = logging.getLogger(__name__)
@@ -130,136 +147,6 @@ class HandoverState:
         return (len(self.documents_completed) / total) * 100
 
 
-class Scratchpad:
-    """
-    Main interface for managing a research/content session.
-
-    The Scratchpad provides methods for:
-    - Adding and retrieving notes
-    - Tracking document progress
-    - Saving session state
-    - Preparing for handover
-    """
-
-    def __init__(
-        self,
-        session: Session,
-        backend: StorageBackend,
-    ):
-        """
-        Initialize a Scratchpad.
-
-        Args:
-            session: The session this scratchpad is managing
-            backend: Storage backend for persistence
-        """
-        self.session = session
-        self.backend = backend
-
-    @property
-    def session_id(self) -> str:
-        """Get the session ID."""
-        return self.session.id
-
-    @property
-    def task(self) -> str:
-        """Get the task description."""
-        return self.session.task
-
-    async def add_note(self, note: Note) -> None:
-        """
-        Add a note to the scratchpad.
-
-        Args:
-            note: The note to add
-        """
-        self.session.notes.append(note)
-        self.session.touch()
-        await self.backend.save_note(self.session.id, note)
-        logger.debug(f"Added note {note.id} to session {self.session.id}")
-
-    async def get_notes(self, document_id: Optional[str] = None) -> List[Note]:
-        """
-        Get notes, optionally filtered by document.
-
-        Args:
-            document_id: Optional document ID to filter by
-
-        Returns:
-            List of notes
-        """
-        if document_id:
-            return [n for n in self.session.notes if n.document_id == document_id]
-        return self.session.notes
-
-    async def update_document_progress(
-        self,
-        document_id: str,
-        processed_pages: int,
-        position: str,
-        status: Optional[str] = None,
-    ) -> None:
-        """
-        Update progress on a document.
-
-        Args:
-            document_id: The document being updated
-            processed_pages: Number of pages processed
-            position: Human-readable position string
-            status: Optional new status
-        """
-        for doc in self.session.documents:
-            if doc.id == document_id:
-                doc.processed_pages = processed_pages
-                doc.position = position
-                if status:
-                    doc.status = status
-                self.session.touch()
-                await self.backend.update_document(self.session.id, doc)
-                logger.debug(f"Updated document {document_id} progress: {position}")
-                return
-
-        logger.warning(f"Document {document_id} not found in session")
-
-    async def mark_document_complete(self, document_id: str) -> None:
-        """
-        Mark a document as completely processed.
-
-        Args:
-            document_id: The document to mark complete
-        """
-        for doc in self.session.documents:
-            if doc.id == document_id:
-                doc.status = "complete"
-                doc.processed_pages = doc.total_pages
-                doc.position = f"page {doc.total_pages} of {doc.total_pages} (complete)"
-                self.session.touch()
-                await self.backend.update_document(self.session.id, doc)
-                logger.info(f"Marked document {document_id} as complete")
-                return
-
-    def get_current_document(self) -> Optional[Document]:
-        """Get the document currently being processed."""
-        for doc in self.session.documents:
-            if doc.status == "in_progress":
-                return doc
-        return None
-
-    def get_pending_documents(self) -> List[Document]:
-        """Get list of documents not yet started."""
-        return [d for d in self.session.documents if d.status == "pending"]
-
-    def get_completed_documents(self) -> List[Document]:
-        """Get list of completed documents."""
-        return [d for d in self.session.documents if d.status == "complete"]
-
-    async def save(self) -> None:
-        """Save the current session state."""
-        self.session.touch()
-        await self.backend.save_session(self.session)
-        logger.debug(f"Saved session {self.session.id}")
-
-
 class HandoverManager:
     """
     Manages the handover process for AI context continuity.
@@ -269,11 +156,24 @@ class HandoverManager:
     2. Compressing notes to fit in the next context
     3. Creating clear instructions for resuming work
     4. Generating prompts for the next AI context
+
+    This class works with the Scratchpad class from scratchpad.py to
+    prepare comprehensive handover states.
+
+    Example:
+        scratchpad = Scratchpad(session_id="research-123")
+        await scratchpad.initialize()
+        session = await scratchpad.start_session(task="Research", documents=[...])
+
+        # When context is full
+        manager = HandoverManager(scratchpad)
+        state = await manager.prepare_handover()
+        prompt = await manager.create_handover_prompt(state)
     """
 
     def __init__(
         self,
-        scratchpad: Scratchpad,
+        scratchpad: "Scratchpad",
         llm_summarizer: Optional[Any] = None,
         max_summary_tokens: int = 2000,
         max_findings: int = 10,
@@ -282,8 +182,9 @@ class HandoverManager:
         Initialize the HandoverManager.
 
         Args:
-            scratchpad: The scratchpad managing the current session
+            scratchpad: The Scratchpad instance managing the current session
             llm_summarizer: Optional LLM interface for summarization
+                           (should have a 'chat' method or be callable)
             max_summary_tokens: Maximum tokens for the notes summary
             max_findings: Maximum number of key findings to include
         """
@@ -305,33 +206,36 @@ class HandoverManager:
         Returns:
             HandoverState containing everything needed to resume
         """
-        session = self.scratchpad.session
+        session = await self.scratchpad.get_session()
+        if not session:
+            raise RuntimeError("No active session. Call start_session() first.")
+
         logger.info(f"Preparing handover for session {session.id}")
 
-        # 1. Save current state
-        await self.scratchpad.save()
+        # Get document categorization from the session
+        completed = [d for d in session.documents if d.status == "complete"]
+        pending = [d for d in session.documents if d.status == "pending"]
+        in_progress = [d for d in session.documents if d.status == "in_progress"]
+        current = in_progress[0] if in_progress else None
 
-        # 2. Categorize documents
-        completed = self.scratchpad.get_completed_documents()
-        pending = self.scratchpad.get_pending_documents()
-        current = self.scratchpad.get_current_document()
-
-        # 3. Get and summarize notes
+        # Get and summarize notes
         notes = await self.scratchpad.get_notes()
-        notes_summary = await self.summarize_notes(notes)
+        notes_summary = await self.summarize_notes(notes, session.task)
 
-        # 4. Extract key findings
-        key_findings = await self.extract_key_findings(notes)
+        # Extract key findings
+        key_findings = await self.extract_key_findings(notes, session.task)
 
-        # 5. Collect citations
+        # Collect citations
         citations = self._collect_citations(notes)
 
-        # 6. Determine next action
+        # Determine next action
         next_action = self._determine_next_action(current, pending)
 
-        # 7. Increment context refresh counter
+        # Increment context refresh counter and save
         session.context_refreshes += 1
-        await self.scratchpad.save()
+        session.touch()
+        # Force save via the backend
+        await self.scratchpad._backend.save_session(session)
 
         state = HandoverState(
             session_id=session.id,
@@ -389,10 +293,16 @@ class HandoverManager:
         findings_text = "\n".join(f"- {f}" for f in state.key_findings) if state.key_findings else "None yet"
 
         # Build the prompt
+        total_docs = (
+            len(state.documents_completed) +
+            len(state.documents_pending) +
+            (1 if state.current_document else 0)
+        )
+
         prompt = HANDOVER_PROMPT.format(
             task=state.task,
             completed=len(state.documents_completed),
-            total=len(state.documents_completed) + len(state.documents_pending) + (1 if state.current_document else 0),
+            total=total_docs,
             document_status=document_status,
             notes_summary=state.notes_summary or "No notes yet",
             current_position=state.current_position or "Not started",
@@ -421,7 +331,9 @@ class HandoverManager:
             - position: Where to start reading
             - context: Additional context for the AI
         """
-        session = self.scratchpad.session
+        session = await self.scratchpad.get_session()
+        if not session:
+            raise RuntimeError("No active session")
 
         # Find the current document
         current_doc = None
@@ -433,11 +345,11 @@ class HandoverManager:
 
         # If no current doc, get next pending
         if not current_doc:
-            pending = self.scratchpad.get_pending_documents()
+            pending = [d for d in session.documents if d.status == "pending"]
             if pending:
                 current_doc = pending[0]
                 current_doc.status = "in_progress"
-                await self.scratchpad.backend.update_document(session.id, current_doc)
+                await self.scratchpad._backend.update_document(session.id, current_doc)
 
         return {
             "scratchpad": self.scratchpad,
@@ -455,6 +367,7 @@ class HandoverManager:
     async def summarize_notes(
         self,
         notes: List[Note],
+        task: str,
         max_tokens: Optional[int] = None,
     ) -> str:
         """
@@ -466,6 +379,7 @@ class HandoverManager:
 
         Args:
             notes: List of notes to summarize
+            task: The task description for context
             max_tokens: Maximum tokens for the summary (default from init)
 
         Returns:
@@ -486,7 +400,7 @@ class HandoverManager:
         if self.llm_summarizer and len(all_content) > max_tokens * 4:
             try:
                 prompt = NOTES_SUMMARIZATION_PROMPT.format(
-                    task=self.scratchpad.task,
+                    task=task,
                     notes=all_content,
                     max_tokens=max_tokens,
                 )
@@ -504,12 +418,17 @@ class HandoverManager:
 
         return all_content
 
-    async def extract_key_findings(self, notes: List[Note]) -> List[str]:
+    async def extract_key_findings(
+        self,
+        notes: List[Note],
+        task: str,
+    ) -> List[str]:
         """
         Extract the most important findings from notes.
 
         Args:
             notes: List of notes to analyze
+            task: The task description for context
 
         Returns:
             List of key finding strings
@@ -522,7 +441,7 @@ class HandoverManager:
             try:
                 all_content = "\n\n".join(n.content for n in notes)
                 prompt = KEY_FINDINGS_EXTRACTION_PROMPT.format(
-                    task=self.scratchpad.task,
+                    task=task,
                     notes=all_content,
                     max_findings=self.max_findings,
                 )

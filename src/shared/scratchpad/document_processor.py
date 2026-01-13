@@ -12,13 +12,54 @@ import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-
-# Import the document processor skill
-sys.path.insert(0, str(Path(__file__).parents[4] / "skills" / "document-processor"))
-from processor import DocumentProcessor, ProcessedDocument as RawProcessedDocument
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 logger = logging.getLogger(__name__)
+
+# Lazy import of the document processor skill
+_DocumentProcessor = None
+_processor_import_attempted = False
+
+
+def _get_document_processor():
+    """Lazily import and return the DocumentProcessor class."""
+    global _DocumentProcessor, _processor_import_attempted
+
+    if _DocumentProcessor is not None:
+        return _DocumentProcessor
+
+    if _processor_import_attempted:
+        raise ImportError(
+            "DocumentProcessor skill not available. "
+            "Ensure skills/document-processor is in the Python path."
+        )
+
+    _processor_import_attempted = True
+
+    # Try multiple import strategies
+    try:
+        # First try direct import (if already in path)
+        from processor import DocumentProcessor
+        _DocumentProcessor = DocumentProcessor
+        return _DocumentProcessor
+    except ImportError:
+        pass
+
+    try:
+        # Try adding skills directory to path
+        skills_path = Path(__file__).parents[4] / "skills" / "document-processor"
+        if skills_path.exists():
+            sys.path.insert(0, str(skills_path))
+            from processor import DocumentProcessor
+            _DocumentProcessor = DocumentProcessor
+            return _DocumentProcessor
+    except ImportError:
+        pass
+
+    raise ImportError(
+        "DocumentProcessor skill not available. "
+        "Ensure skills/document-processor is in the Python path."
+    )
 
 
 class ChunkingMethod(str, Enum):
@@ -149,7 +190,14 @@ class DocumentChunker:
         self.max_chunk_tokens = max_chunk_tokens
         self.overlap_tokens = overlap_tokens
         self.chunking_method = chunking_method
-        self._processor = DocumentProcessor()
+        self._processor = None  # Lazy initialized
+
+    def _get_processor(self):
+        """Get the document processor, initializing if needed."""
+        if self._processor is None:
+            DocumentProcessor = _get_document_processor()
+            self._processor = DocumentProcessor()
+        return self._processor
 
     async def process_document(self, file_path: str) -> ProcessedDocument:
         """
@@ -173,7 +221,8 @@ class DocumentChunker:
             raise FileNotFoundError(f"Document not found: {file_path}")
 
         # Process with the document-processor skill
-        result = self._processor.process(str(path))
+        processor = self._get_processor()
+        result = processor.process(str(path))
 
         if not result.success:
             raise ValueError(f"Failed to process document: {result.error}")
