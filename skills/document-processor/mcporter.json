@@ -1,0 +1,60 @@
+{
+  "name": "document-processor",
+  "version": "1.0.0",
+  "description": "Process PDFs, Word docs, and other documents",
+  "mcp": {
+    "server": {
+      "command": "python",
+      "args": ["-m", "processor"],
+      "cwd": "."
+    },
+    "tools": [
+      {
+        "name": "process_document",
+        "description": "Extract text content from a PDF, Word doc, or other document",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "Path to the document file"
+            }
+          },
+          "required": ["file_path"]
+        }
+      },
+      {
+        "name": "summarize_document",
+        "description": "Process a document and get a preview/summary",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "Path to the document file"
+            },
+            "max_length": {
+              "type": "integer",
+              "description": "Maximum summary length in words",
+              "default": 500
+            }
+          },
+          "required": ["file_path"]
+        }
+      },
+      {
+        "name": "get_supported_formats",
+        "description": "Get list of supported document formats",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    ]
+  },
+  "config": {
+    "max_file_size_mb": 50,
+    "ocr_enabled": true,
+    "preserve_formatting": true
+  }
+}

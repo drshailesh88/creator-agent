@@ -1,0 +1,27 @@
+# Document Processor Dependencies
+
+# PDF Processing (install at least one)
+pymupdf>=1.23.0        # Fast PDF text extraction (recommended)
+pdfplumber>=0.10.0     # Better for tables
+
+# Word Documents
+python-docx>=1.0.0     # .docx files
+
+# PowerPoint
+python-pptx>=0.6.21    # .pptx files
+
+# HTML to Markdown
+html2text>=2020.1.16
+
+# RTF Files
+striprtf>=0.0.26
+
+# OCR (optional - for scanned PDFs)
+# pytesseract>=0.3.10  # Requires Tesseract installed on system
+# Pillow>=10.0.0       # For image processing
+
+# Quick install (core):
+# pip install pymupdf python-docx python-pptx html2text
+
+# Full install:
+# pip install pymupdf pdfplumber python-docx python-pptx html2text striprtf
