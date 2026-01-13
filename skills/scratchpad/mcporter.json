@@ -1,0 +1,252 @@
+{
+  "mcpServers": {
+    "scratchpad": {
+      "command": "python",
+      "args": ["mcp_server.py"],
+      "cwd": "${SKILL_DIR}",
+      "env": {
+        "SCRATCHPAD_DIR": "${SCRATCHPAD_DIR:-~/.clawdbot/scratchpad}",
+        "LOG_LEVEL": "${LOG_LEVEL:-info}"
+      },
+      "description": "Shared scratchpad for multi-document research with persistence across context refreshes",
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": false
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "start_session",
+      "description": "Start a new research session with documents. Creates a tracked workspace for notes and progress.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "type": "string",
+            "description": "Description of the research task or goal"
+          },
+          "document_paths": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Paths to documents to process in this session"
+          },
+          "session_name": {
+            "type": "string",
+            "description": "Optional friendly name for the session"
+          }
+        },
+        "required": ["task"]
+      }
+    },
+    {
+      "name": "save_notes",
+      "description": "Save research notes to the scratchpad. Notes persist across context refreshes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The notes content to save"
+          },
+          "document_id": {
+            "type": "string",
+            "description": "Optional: Associate notes with a specific document"
+          },
+          "tags": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Optional tags for organizing notes"
+          },
+          "section": {
+            "type": "string",
+            "description": "Optional section name (e.g., 'key_findings', 'quotes', 'questions')"
+          }
+        },
+        "required": ["content"]
+      }
+    },
+    {
+      "name": "get_notes",
+      "description": "Retrieve notes from the scratchpad. Can filter by document or tags.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "description": "Filter notes by document ID"
+          },
+          "tags": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Filter notes by tags"
+          },
+          "section": {
+            "type": "string",
+            "description": "Filter notes by section"
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Get notes from a specific session (defaults to current)"
+          }
+        }
+      }
+    },
+    {
+      "name": "mark_progress",
+      "description": "Mark reading/processing progress on a document.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "description": "The document to mark progress on"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["not_started", "in_progress", "completed", "needs_review"],
+            "description": "Current status of the document"
+          },
+          "position": {
+            "type": "string",
+            "description": "Where you left off (e.g., 'page 15', 'section 3.2')"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes about current progress"
+          }
+        },
+        "required": ["document_id", "status"]
+      }
+    },
+    {
+      "name": "get_progress",
+      "description": "Get overall research progress across all documents.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "description": "Get progress for a specific session (defaults to current)"
+          }
+        }
+      }
+    },
+    {
+      "name": "handover",
+      "description": "Prepare for context refresh. Saves all state and generates a handover summary.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "Optional summary of what was accomplished"
+          },
+          "next_steps": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Optional list of next steps to continue"
+          }
+        }
+      }
+    },
+    {
+      "name": "resume_session",
+      "description": "Resume a paused research session. Loads all saved state.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "description": "The session ID to resume"
+          }
+        },
+        "required": ["session_id"]
+      }
+    },
+    {
+      "name": "list_sessions",
+      "description": "List all active and paused research sessions.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused", "completed", "all"],
+            "description": "Filter sessions by status"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of sessions to return"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_writing_context",
+      "description": "Get all notes formatted for writing phase. Consolidates research for content creation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "description": "Session to get writing context for (defaults to current)"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["outline", "detailed", "summary"],
+            "description": "How to format the output"
+          }
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "name": "session",
+      "description": "Access a research session's full state",
+      "uriTemplate": "scratchpad://session/{session_id}",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "notes",
+      "description": "Access notes from a session",
+      "uriTemplate": "scratchpad://session/{session_id}/notes",
+      "mimeType": "application/json"
+    }
+  ],
+  "personality": {
+    "preserveSoulMd": true,
+    "allowPersonalityOverride": false,
+    "responseStyle": {
+      "maintainWarmth": true,
+      "useClawdbotVoice": true,
+      "friendlyErrorMessages": true
+    }
+  },
+  "clawdbotIntegration": {
+    "triggers": {
+      "commands": ["/scratchpad", "/notes", "/research"],
+      "keywords": ["save notes", "research session", "handover", "resume research"],
+      "patterns": ["start.*research.*session", "save.*notes", "what.*progress"]
+    },
+    "priority": 60,
+    "fallbackToDefault": true
+  },
+  "storage": {
+    "type": "file",
+    "location": "${SCRATCHPAD_DIR}",
+    "format": "json",
+    "retention": {
+      "active_sessions": "indefinite",
+      "completed_sessions": "90 days"
+    }
+  },
+  "metadata": {
+    "author": "Clawdbot",
+    "license": "MIT",
+    "tags": ["research", "notes", "persistence", "multi-document"],
+    "personalitySafe": true
+  }
+}
