@@ -1,0 +1,183 @@
+% DrShailesh Beamer Theme
+% Usage: \usetheme{drshailesh}
+%
+% A clean, modern Beamer theme using brand colors
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamer-theme}[2024/01/14 DrShailesh Beamer Theme]
+
+\RequirePackage{tikz}
+\RequirePackage{fontawesome5}
+\RequirePackage{brand-colors}
+
+\usetikzlibrary{calc}
+
+% =============================================================================
+% COLOR THEME
+% =============================================================================
+
+\setbeamercolor{normal text}{fg=BrandText}
+\setbeamercolor{alerted text}{fg=BrandAccent}
+\setbeamercolor{example text}{fg=BrandSecondary}
+
+\setbeamercolor{structure}{fg=BrandPrimary}
+
+\setbeamercolor{background canvas}{bg=BrandNeutral}
+
+\setbeamercolor{palette primary}{bg=BrandPrimary, fg=white}
+\setbeamercolor{palette secondary}{bg=BrandSecondary, fg=white}
+\setbeamercolor{palette tertiary}{bg=BrandAccent, fg=white}
+
+\setbeamercolor{frametitle}{fg=BrandPrimary, bg=BrandBackground}
+\setbeamercolor{framesubtitle}{fg=BrandSecondary}
+
+\setbeamercolor{title}{fg=BrandPrimary}
+\setbeamercolor{subtitle}{fg=BrandSecondary}
+\setbeamercolor{author}{fg=BrandText}
+\setbeamercolor{date}{fg=BrandText!70}
+\setbeamercolor{institute}{fg=BrandSecondary}
+
+\setbeamercolor{block title}{bg=BrandPrimary, fg=white}
+\setbeamercolor{block body}{bg=BrandBackground, fg=BrandText}
+
+\setbeamercolor{block title alerted}{bg=BrandAlert, fg=white}
+\setbeamercolor{block body alerted}{bg=BrandAlert!10, fg=BrandText}
+
+\setbeamercolor{block title example}{bg=BrandSecondary, fg=white}
+\setbeamercolor{block body example}{bg=BrandSecondary!10, fg=BrandText}
+
+\setbeamercolor{itemize item}{fg=BrandPrimary}
+\setbeamercolor{itemize subitem}{fg=BrandSecondary}
+\setbeamercolor{enumerate item}{fg=BrandPrimary}
+
+\setbeamercolor{section in toc}{fg=BrandPrimary}
+\setbeamercolor{subsection in toc}{fg=BrandSecondary}
+
+\setbeamercolor{footline}{fg=BrandText!60, bg=BrandBackground}
+
+% =============================================================================
+% FONT THEME
+% =============================================================================
+
+\setbeamerfont{title}{size=\Huge, series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{institute}{size=\small}
+
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize}
+
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+
+\setbeamerfont{footline}{size=\tiny}
+
+% =============================================================================
+% INNER THEME
+% =============================================================================
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Itemize bullets
+\setbeamertemplate{itemize item}{\textcolor{BrandPrimary}{\faChevronRight}}
+\setbeamertemplate{itemize subitem}{\textcolor{BrandSecondary}{\faAngleRight}}
+\setbeamertemplate{itemize subsubitem}{\textcolor{BrandAccent}{\textbullet}}
+
+% Enumerate
+\setbeamertemplate{enumerate item}{\textcolor{BrandPrimary}{\insertenumlabel.}}
+
+% =============================================================================
+% OUTER THEME
+% =============================================================================
+
+% Frame title
+\setbeamertemplate{frametitle}{
+    \vspace{0.5cm}
+    \begin{beamercolorbox}[wd=\paperwidth, ht=1.2cm, dp=0.3cm]{frametitle}
+        \hspace{0.5cm}\insertframetitle
+        \ifx\insertframesubtitle\empty\else
+            \\[2pt]\hspace{0.5cm}{\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}\insertframesubtitle}
+        \fi
+    \end{beamercolorbox}
+}
+
+% Footline
+\setbeamertemplate{footline}{
+    \begin{beamercolorbox}[wd=\paperwidth, ht=0.5cm, dp=0.2cm]{footline}
+        \hspace{0.5cm}\insertshorttitle
+        \hfill
+        \insertframenumber/\inserttotalframenumber
+        \hspace{0.5cm}
+    \end{beamercolorbox}
+}
+
+% Title page
+\setbeamertemplate{title page}{
+    \begin{tikzpicture}[remember picture, overlay]
+        % Background
+        \fill[BrandPrimary] (current page.north west) rectangle ([yshift=-4cm]current page.north east);
+
+        % Decorative element
+        \fill[BrandSecondary, opacity=0.3]
+            ([xshift=8cm, yshift=-2cm]current page.north west) circle (3cm);
+        \fill[BrandAccent, opacity=0.2]
+            ([xshift=12cm, yshift=-3.5cm]current page.north west) circle (2cm);
+    \end{tikzpicture}
+
+    \vspace{2cm}
+    \begin{center}
+        {\usebeamerfont{title}\usebeamercolor[fg]{title}\textcolor{white}{\inserttitle}}\\[0.5cm]
+        {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\textcolor{white!80}{\insertsubtitle}}
+    \end{center}
+
+    \vspace{1.5cm}
+    \begin{center}
+        {\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor}\\[0.3cm]
+        {\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute}\\[0.3cm]
+        {\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}
+    \end{center}
+}
+
+% Section page
+\AtBeginSection[]{
+    \begin{frame}
+        \begin{tikzpicture}[remember picture, overlay]
+            \fill[BrandSecondary] (current page.north west) rectangle (current page.south east);
+        \end{tikzpicture}
+        \vfill
+        \centering
+        {\usebeamerfont{title}\textcolor{white}{\insertsectionhead}}
+        \vfill
+    \end{frame}
+}
+
+% =============================================================================
+% CUSTOM BOXES
+% =============================================================================
+
+% Info box
+\newenvironment{infobox}[1]{
+    \begin{beamercolorbox}[rounded=true, shadow=true, wd=\textwidth]{block body}
+        \textcolor{BrandPrimary}{\faInfoCircle\quad\textbf{#1}}\\[5pt]
+}{
+    \end{beamercolorbox}
+}
+
+% Warning box
+\newenvironment{warningbox}[1]{
+    \begin{beamercolorbox}[rounded=true, shadow=true, wd=\textwidth]{block body alerted}
+        \textcolor{BrandAlert}{\faExclamationTriangle\quad\textbf{#1}}\\[5pt]
+}{
+    \end{beamercolorbox}
+}
+
+% Tip box
+\newenvironment{tipbox}[1]{
+    \begin{beamercolorbox}[rounded=true, shadow=true, wd=\textwidth]{block body example}
+        \textcolor{BrandSecondary}{\faLightbulb\quad\textbf{#1}}\\[5pt]
+}{
+    \end{beamercolorbox}
+}
+
+\endinput

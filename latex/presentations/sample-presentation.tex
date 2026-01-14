@@ -1,0 +1,190 @@
+% DrShailesh Sample Presentation
+% Compile with: pdflatex sample-presentation.tex
+%
+% This demonstrates the branded Beamer theme
+
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fontawesome5}
+\usepackage{brand-colors}
+\usepackage{beamer-theme}
+
+% Presentation metadata
+\title{Your Presentation Title}
+\subtitle{A compelling subtitle that hooks the audience}
+\author{Dr. Shailesh}
+\institute{Your Organization}
+\date{\today}
+
+\begin{document}
+
+% =============================================================================
+% TITLE SLIDE
+% =============================================================================
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+% =============================================================================
+% TABLE OF CONTENTS
+% =============================================================================
+\begin{frame}{Agenda}
+    \tableofcontents
+\end{frame}
+
+% =============================================================================
+% SECTION 1
+% =============================================================================
+\section{Introduction}
+
+\begin{frame}{Why This Matters}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \item First key point about the topic
+                \item Second important consideration
+                \item Third compelling reason
+                \item Supporting evidence
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{center}
+                \textcolor{BrandPrimary}{\Huge\faHeartbeat}\\[1cm]
+                \textcolor{BrandSecondary}{\Large Health Matters}
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Key Statistics}
+    \begin{columns}[T]
+        \begin{column}{0.25\textwidth}
+            \begin{center}
+                \textcolor{BrandPrimary}{\Huge 85\%}\\
+                \small Success Rate
+            \end{center}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \begin{center}
+                \textcolor{BrandSecondary}{\Huge 10K+}\\
+                \small Patients Helped
+            \end{center}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \begin{center}
+                \textcolor{BrandAccent}{\Huge 24/7}\\
+                \small Availability
+            \end{center}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \begin{center}
+                \textcolor{BrandPrimary}{\Huge \#1}\\
+                \small Rated Service
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% =============================================================================
+% SECTION 2
+% =============================================================================
+\section{Core Concepts}
+
+\begin{frame}{Understanding the Basics}
+    \begin{block}{Definition}
+        A clear explanation of the fundamental concept that forms the foundation of this presentation.
+    \end{block}
+
+    \vspace{0.5cm}
+
+    \begin{alertblock}{Important Warning}
+        Critical information that the audience must be aware of before proceeding.
+    \end{alertblock}
+
+    \vspace{0.5cm}
+
+    \begin{exampleblock}{Practical Example}
+        A real-world application that illustrates how this concept works in practice.
+    \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Step-by-Step Process}
+    \begin{enumerate}
+        \item \textbf{Assessment} - Evaluate the current situation
+        \item \textbf{Planning} - Develop a comprehensive strategy
+        \item \textbf{Implementation} - Execute the plan systematically
+        \item \textbf{Monitoring} - Track progress and adjust
+        \item \textbf{Review} - Analyze outcomes and improve
+    \end{enumerate}
+
+    \vspace{1cm}
+
+    \begin{tipbox}{Pro Tip}
+        Always document your progress at each step for better outcomes.
+    \end{tipbox}
+\end{frame}
+
+% =============================================================================
+% SECTION 3
+% =============================================================================
+\section{Results \& Impact}
+
+\begin{frame}{Measurable Outcomes}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{itemize}
+                \item Significant improvement in key metrics
+                \item Positive feedback from stakeholders
+                \item Sustainable long-term benefits
+                \item Cost-effective implementation
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{infobox}{Key Finding}
+                Our approach resulted in a 40\% improvement over traditional methods.
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% =============================================================================
+% CONCLUSION
+% =============================================================================
+\section{Conclusion}
+
+\begin{frame}{Key Takeaways}
+    \begin{columns}[T]
+        \begin{column}{0.33\textwidth}
+            \begin{center}
+                \textcolor{BrandPrimary}{\Large\faCheckCircle}\\[0.5cm]
+                \textbf{Evidence-Based}\\
+                \small Backed by research
+            \end{center}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \begin{center}
+                \textcolor{BrandSecondary}{\Large\faUsers}\\[0.5cm]
+                \textbf{Patient-Centered}\\
+                \small Focus on outcomes
+            \end{center}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \begin{center}
+                \textcolor{BrandAccent}{\Large\faRocket}\\[0.5cm]
+                \textbf{Actionable}\\
+                \small Ready to implement
+            \end{center}
+        \end{column}
+    \end{columns}
+
+    \vspace{1cm}
+
+    \begin{center}
+        \textcolor{BrandPrimary}{\Large Thank You!}\\[0.3cm]
+        \small Questions? \textcolor{BrandSecondary}{contact@drshailesh.com}
+    \end{center}
+\end{frame}
+
+\end{document}

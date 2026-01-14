@@ -1,0 +1,130 @@
+% DrShailesh Medical Infographic Template
+% Perfect for health education, patient guides, and medical content
+%
+% Compile with: xelatex medical-infographic.tex
+
+\documentclass[tikz,border=10pt]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{fontawesome5}
+
+\usetikzlibrary{
+    shapes.geometric,
+    shapes.symbols,
+    arrows.meta,
+    positioning,
+    calc,
+    fit,
+    backgrounds,
+    shadows.blur,
+    decorations.pathreplacing
+}
+
+% Brand colors
+\usepackage{brand-colors}
+\usepackage{components}
+
+\begin{document}
+\begin{tikzpicture}[remember picture]
+
+% =============================================================================
+% BACKGROUND
+% =============================================================================
+\fill[BrandBackground] (-0.5,-1) rectangle (16,14);
+
+% Decorative header bar
+\fill[BrandPrimary] (-0.5,12.5) rectangle (16,14);
+
+% =============================================================================
+% HEADER
+% =============================================================================
+\node[font=\sffamily\bfseries\Huge, text=white] at (8,13.5) {Understanding Heart Health};
+\node[font=\sffamily, text=white!90] at (8,12.8) {Your comprehensive guide to cardiovascular wellness};
+
+% =============================================================================
+% KEY STATISTICS ROW
+% =============================================================================
+\node[font=\sffamily\bfseries, text=BrandPrimary] at (1,11.5) {Key Facts};
+
+% Stat boxes
+\iconstat{2.5}{10}{\faHeart}{17.9M}{Deaths/Year}
+\iconstat{6.5}{10}{\faGlobe}{32\%}{Global Deaths}
+\iconstat{10.5}{10}{\faUserMd}{80\%}{Preventable}
+\iconstat{14}{10}{\faChartLine}{\#1}{Cause of Death}
+
+% =============================================================================
+% RISK FACTORS SECTION
+% =============================================================================
+\node[
+    brand box,
+    minimum width=7cm,
+    minimum height=5cm,
+    anchor=north west
+] (riskbox) at (0,8) {};
+
+\node[font=\sffamily\bfseries\large, text=BrandPrimary, anchor=north west] at (0.3,7.7) {Risk Factors};
+
+% Risk level bars
+\risklevel{0.5}{6.8}{5.5}{75}
+\node[font=\sffamily\small, text=BrandText, anchor=west] at (6.3,7) {High Blood Pressure};
+
+\risklevel{0.5}{5.8}{5.5}{65}
+\node[font=\sffamily\small, text=BrandText, anchor=west] at (6.3,6) {High Cholesterol};
+
+\risklevel{0.5}{4.8}{5.5}{55}
+\node[font=\sffamily\small, text=BrandText, anchor=west] at (6.3,5) {Smoking};
+
+\risklevel{0.5}{3.8}{5.5}{45}
+\node[font=\sffamily\small, text=BrandText, anchor=west] at (6.3,4) {Obesity};
+
+\risklevel{0.5}{2.8}{5.5}{35}
+\node[font=\sffamily\small, text=BrandText, anchor=west] at (6.3,3) {Physical Inactivity};
+
+% =============================================================================
+% PREVENTION CHECKLIST
+% =============================================================================
+\node[
+    brand box,
+    minimum width=7cm,
+    minimum height=5cm,
+    anchor=north east
+] at (16,8) {};
+
+\node[font=\sffamily\bfseries\large, text=BrandPrimary, anchor=north west] at (9.3,7.7) {Prevention Checklist};
+
+\checkitem{9.7}{6.8}{Regular exercise (30 min/day)}{1}
+\checkitem{9.7}{6.2}{Healthy diet (fruits \& vegetables)}{1}
+\checkitem{9.7}{5.6}{Maintain healthy weight}{1}
+\checkitem{9.7}{5.0}{No smoking}{1}
+\checkitem{9.7}{4.4}{Limit alcohol}{0}
+\checkitem{9.7}{3.8}{Manage stress}{0}
+\checkitem{9.7}{3.2}{Regular health screenings}{1}
+
+% =============================================================================
+% SYMPTOMS TO WATCH - ALERT SECTION
+% =============================================================================
+\node[
+    alert box,
+    minimum width=15.5cm,
+    minimum height=2.2cm,
+    anchor=north
+] at (8,2.3) {};
+
+\node[font=\sffamily\bfseries\large, text=BrandAlert] at (8,1.9) {\faExclamationTriangle\quad Warning Signs - Seek Immediate Help};
+
+\node[font=\sffamily\small, text=BrandText] at (3,1.1) {\faTimesCircle\ Chest Pain};
+\node[font=\sffamily\small, text=BrandText] at (6.5,1.1) {\faTimesCircle\ Shortness of Breath};
+\node[font=\sffamily\small, text=BrandText] at (10.2,1.1) {\faTimesCircle\ Arm/Jaw Pain};
+\node[font=\sffamily\small, text=BrandText] at (13.5,1.1) {\faTimesCircle\ Sudden Dizziness};
+
+\node[font=\sffamily\bfseries, text=BrandAlert] at (8,0.4) {Call Emergency Services Immediately};
+
+% =============================================================================
+% FOOTER
+% =============================================================================
+\node[font=\sffamily\tiny, text=BrandText!60] at (8,-0.5) {Source: World Health Organization | DrShailesh Health Education};
+
+\end{tikzpicture}
+\end{document}

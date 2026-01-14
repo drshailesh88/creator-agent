@@ -1,0 +1,201 @@
+% DrShailesh Infographic Base Template
+% Compile with: pdflatex or xelatex
+%
+% This template provides the foundation for creating branded infographics
+% using TikZ. It includes common components, layouts, and styling.
+
+\documentclass[tikz,border=10pt]{standalone}
+
+% Required packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{fontawesome5}
+\usepackage{calc}
+
+% TikZ libraries
+\usetikzlibrary{
+    shapes.geometric,
+    shapes.symbols,
+    shapes.misc,
+    arrows.meta,
+    positioning,
+    calc,
+    fit,
+    backgrounds,
+    shadows.blur,
+    decorations.pathreplacing,
+    patterns
+}
+
+% Import brand colors (copy brand-colors.sty to same directory or use path)
+\usepackage{brand-colors}
+
+% =============================================================================
+% GLOBAL STYLES
+% =============================================================================
+
+\tikzset{
+    % Base styles
+    brand font/.style={font=\sffamily},
+    title font/.style={font=\sffamily\bfseries\Large, text=BrandPrimary},
+    subtitle font/.style={font=\sffamily\bfseries, text=BrandSecondary},
+    body font/.style={font=\sffamily\small, text=BrandText},
+    %
+    % Box styles
+    brand box/.style={
+        draw=BrandPrimary,
+        fill=BrandBackground,
+        rounded corners=8pt,
+        line width=1.5pt,
+        blur shadow={shadow blur steps=5, shadow xshift=1pt, shadow yshift=-1pt}
+    },
+    accent box/.style={
+        draw=BrandAccent,
+        fill=BrandAccent!10,
+        rounded corners=8pt,
+        line width=1.5pt
+    },
+    alert box/.style={
+        draw=BrandAlert,
+        fill=BrandAlert!10,
+        rounded corners=8pt,
+        line width=2pt
+    },
+    neutral box/.style={
+        draw=BrandText!30,
+        fill=BrandNeutral,
+        rounded corners=6pt,
+        line width=1pt
+    },
+    %
+    % Icon styles
+    icon circle/.style={
+        circle,
+        fill=BrandPrimary,
+        text=white,
+        minimum size=40pt,
+        font=\Large
+    },
+    icon circle accent/.style={
+        circle,
+        fill=BrandAccent,
+        text=white,
+        minimum size=40pt,
+        font=\Large
+    },
+    %
+    % Arrow styles
+    brand arrow/.style={
+        ->,
+        >=Stealth,
+        line width=2pt,
+        BrandPrimary
+    },
+    flow arrow/.style={
+        ->,
+        >=Stealth,
+        line width=3pt,
+        BrandSecondary,
+        rounded corners=3pt
+    },
+    %
+    % Number badges
+    number badge/.style={
+        circle,
+        fill=BrandPrimary,
+        text=white,
+        font=\sffamily\bfseries,
+        minimum size=24pt,
+        inner sep=0pt
+    },
+    number badge accent/.style={
+        circle,
+        fill=BrandAccent,
+        text=white,
+        font=\sffamily\bfseries,
+        minimum size=24pt,
+        inner sep=0pt
+    }
+}
+
+% =============================================================================
+% REUSABLE COMPONENTS
+% =============================================================================
+
+% Stat box: \statbox{x}{y}{icon}{number}{label}
+\newcommand{\statbox}[5]{
+    \node[brand box, minimum width=80pt, minimum height=70pt] at (#1,#2) {};
+    \node[icon circle, font=\large] at (#1,#2+0.6) {#3};
+    \node[title font, font=\sffamily\bfseries\huge] at (#1,#2-0.2) {#4};
+    \node[body font] at (#1,#2-0.8) {#5};
+}
+
+% Step box: \stepbox{x}{y}{number}{title}{description}
+\newcommand{\stepbox}[5]{
+    \node[brand box, minimum width=120pt, minimum height=60pt, anchor=west] (step#3) at (#1,#2) {};
+    \node[number badge] at ([xshift=-12pt]step#3.west) {#3};
+    \node[subtitle font, anchor=west] at ([xshift=10pt]step#3.west |- step#3.north) [yshift=-15pt] {#4};
+    \node[body font, text width=100pt, anchor=north west] at ([xshift=10pt, yshift=-30pt]step#3.north west) {#5};
+}
+
+% Info card: \infocard{x}{y}{width}{title}{content}
+\newcommand{\infocard}[5]{
+    \node[brand box, minimum width=#3, text width=#3-20pt, align=left, anchor=north] at (#1,#2) {
+        \textcolor{BrandPrimary}{\textbf{#4}}\\[5pt]
+        \textcolor{BrandText}{#5}
+    };
+}
+
+% Alert card: \alertcard{x}{y}{width}{content}
+\newcommand{\alertcard}[4]{
+    \node[alert box, minimum width=#3, text width=#3-20pt, align=left, anchor=north] at (#1,#2) {
+        \textcolor{BrandAlert}{\faExclamationTriangle\quad\textbf{Alert}}\\[5pt]
+        \textcolor{BrandText}{#4}
+    };
+}
+
+% Progress bar: \progressbar{x}{y}{width}{percent}{label}
+\newcommand{\progressbar}[5]{
+    \fill[BrandText!20, rounded corners=3pt] (#1,#2) rectangle (#1+#3,#2+0.3);
+    \fill[BrandPrimary, rounded corners=3pt] (#1,#2) rectangle (#1+#3*#4/100,#2+0.3);
+    \node[body font, anchor=west] at (#1+#3+0.2,#2+0.15) {#5};
+}
+
+% Timeline dot: \timelinedot{x}{y}{label}{description}
+\newcommand{\timelinedot}[4]{
+    \node[circle, fill=BrandPrimary, minimum size=12pt] at (#1,#2) {};
+    \node[subtitle font, anchor=south] at (#1,#2+0.3) {#3};
+    \node[body font, anchor=north, text width=60pt, align=center] at (#1,#2-0.3) {#4};
+}
+
+\begin{document}
+\begin{tikzpicture}[remember picture]
+
+% Background
+\fill[BrandBackground] (-1,-1) rectangle (15,12);
+
+% Title area
+\node[title font, font=\sffamily\bfseries\Huge] at (7,11) {Your Infographic Title};
+\node[body font, font=\sffamily] at (7,10.3) {A compelling subtitle that explains the topic};
+
+% === ADD YOUR CONTENT HERE ===
+
+% Example: Three stat boxes
+\statbox{2}{7}{\faHeart}{85\%}{Heart Health}
+\statbox{7}{7}{\faBrain}{92\%}{Brain Function}
+\statbox{12}{7}{\faRunning}{78\%}{Activity Level}
+
+% Example: Process steps
+\stepbox{1}{4}{1}{Research}{Gather data from reliable sources}
+\stepbox{5.5}{4}{2}{Analyze}{Process and interpret findings}
+\stepbox{10}{4}{3}{Create}{Design compelling visuals}
+
+% Example: Key insight box
+\infocard{7}{1.5}{200pt}{Key Insight}{This is where you highlight the most important takeaway from your infographic.}
+
+% Footer with branding
+\node[body font, text=BrandText!60] at (7,-0.5) {Created with DrShailesh Brand System};
+
+\end{tikzpicture}
+\end{document}

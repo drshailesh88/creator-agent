@@ -1,0 +1,258 @@
+% DrShailesh Article/Document Template
+% Compile with: pdflatex or xelatex
+%
+% A clean, professional document template with brand colors
+
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{fontawesome5}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+
+% Brand colors
+\usepackage{brand-colors}
+
+\tcbuselibrary{skins, breakable}
+
+% =============================================================================
+% HYPERLINK SETUP
+% =============================================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=BrandPrimary,
+    urlcolor=BrandSecondary,
+    citecolor=BrandSecondary
+}
+
+% =============================================================================
+% HEADER/FOOTER
+% =============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{BrandText!60}{\small \leftmark}}
+\fancyhead[R]{\textcolor{BrandText!60}{\small DrShailesh}}
+\fancyfoot[C]{\textcolor{BrandText!60}{\small \thepage}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{BrandPrimary!30}\leaders\hrule height \headrulewidth\hfill}}
+
+% =============================================================================
+% SECTION FORMATTING
+% =============================================================================
+\titleformat{\section}
+    {\color{BrandPrimary}\Large\bfseries}
+    {\thesection}{1em}{}
+    [\color{BrandPrimary!30}\titlerule]
+
+\titleformat{\subsection}
+    {\color{BrandSecondary}\large\bfseries}
+    {\thesubsection}{1em}{}
+
+\titleformat{\subsubsection}
+    {\color{BrandText}\normalsize\bfseries}
+    {\thesubsubsection}{1em}{}
+
+% =============================================================================
+% LIST FORMATTING
+% =============================================================================
+\setlist[itemize]{label=\textcolor{BrandPrimary}{\faChevronRight}}
+\setlist[enumerate]{label=\textcolor{BrandPrimary}{\arabic*.}}
+
+% =============================================================================
+% CUSTOM BOXES
+% =============================================================================
+
+% Info box
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=BrandBackground,
+    colframe=BrandPrimary,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\faInfoCircle\quad Information},
+    #1
+}
+
+% Warning box
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=BrandAccent!10,
+    colframe=BrandAccent,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\faExclamationTriangle\quad Warning},
+    #1
+}
+
+% Alert box (emergency)
+\newtcolorbox{alertbox}[1][]{
+    enhanced,
+    colback=BrandAlert!10,
+    colframe=BrandAlert,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\faExclamationCircle\quad Alert},
+    #1
+}
+
+% Tip box
+\newtcolorbox{tipbox}[1][]{
+    enhanced,
+    colback=BrandSecondary!10,
+    colframe=BrandSecondary,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\faLightbulb\quad Tip},
+    #1
+}
+
+% Key point box
+\newtcolorbox{keypoint}[1][]{
+    enhanced,
+    colback=BrandNeutral,
+    colframe=BrandPrimary,
+    boxrule=2pt,
+    left=10pt,
+    right=10pt,
+    #1
+}
+
+% =============================================================================
+% DOCUMENT INFO
+% =============================================================================
+\title{
+    \textcolor{BrandPrimary}{\Huge Your Document Title}\\[0.5cm]
+    \textcolor{BrandSecondary}{\large A descriptive subtitle}
+}
+\author{
+    \textcolor{BrandText}{Dr. Shailesh}\\
+    \textcolor{BrandText!70}{\small your@email.com}
+}
+\date{\textcolor{BrandText!70}{\today}}
+
+% =============================================================================
+% DOCUMENT
+% =============================================================================
+\begin{document}
+
+% Custom title page
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture, overlay]
+        % Header bar
+        \fill[BrandPrimary] (current page.north west) rectangle ([yshift=-3cm]current page.north east);
+
+        % Decorative circles
+        \fill[BrandSecondary, opacity=0.3] ([xshift=3cm, yshift=-1.5cm]current page.north west) circle (1.5cm);
+        \fill[BrandAccent, opacity=0.2] ([xshift=-3cm, yshift=-2cm]current page.north east) circle (1cm);
+
+        % Footer bar
+        \fill[BrandBackground] (current page.south west) rectangle ([yshift=2cm]current page.south east);
+    \end{tikzpicture}
+
+    \vspace{3cm}
+
+    \begin{center}
+        {\textcolor{BrandPrimary}{\Huge\bfseries Your Document Title}}\\[1cm]
+        {\textcolor{BrandSecondary}{\Large A descriptive subtitle that explains the content}}\\[2cm]
+        {\textcolor{BrandText}{\large Dr. Shailesh}}\\[0.5cm]
+        {\textcolor{BrandText!70}{your@email.com}}\\[2cm]
+        {\textcolor{BrandText!60}{\today}}
+    \end{center}
+
+    \vfill
+
+    \begin{center}
+        \textcolor{BrandText!40}{\small DrShailesh Health Education}
+    \end{center}
+\end{titlepage}
+
+% Table of contents
+\tableofcontents
+\newpage
+
+% =============================================================================
+% CONTENT
+% =============================================================================
+
+\section{Introduction}
+
+This is the introduction section. You can write your content here with full brand consistency.
+
+\begin{keypoint}
+    This is a key point that you want readers to remember. It stands out visually while maintaining brand consistency.
+\end{keypoint}
+
+\subsection{Background}
+
+Some background information about the topic.
+
+\begin{itemize}
+    \item First important point
+    \item Second important point
+    \item Third important point
+\end{itemize}
+
+\subsection{Objectives}
+
+\begin{enumerate}
+    \item First objective of this document
+    \item Second objective
+    \item Third objective
+\end{enumerate}
+
+\section{Main Content}
+
+\begin{infobox}
+    This is an information box. Use it to highlight important information that readers should be aware of.
+\end{infobox}
+
+\subsection{Key Findings}
+
+Your main content goes here...
+
+\begin{tipbox}
+    This is a tip box. Use it to share helpful advice or best practices with your readers.
+\end{tipbox}
+
+\subsection{Important Considerations}
+
+\begin{warningbox}
+    This is a warning box. Use it to caution readers about potential issues or common mistakes.
+\end{warningbox}
+
+\section{Emergency Information}
+
+\begin{alertbox}
+    \textbf{Call Emergency Services Immediately} if you experience:
+    \begin{itemize}[label=\textcolor{BrandAlert}{\faExclamationCircle}]
+        \item Chest pain or discomfort
+        \item Difficulty breathing
+        \item Sudden weakness or numbness
+    \end{itemize}
+\end{alertbox}
+
+\section{Conclusion}
+
+Summarize the key points here.
+
+\begin{keypoint}
+    \textbf{Key Takeaway:} The most important message you want readers to remember from this document.
+\end{keypoint}
+
+% =============================================================================
+% REFERENCES (optional)
+% =============================================================================
+\section*{References}
+\begin{enumerate}[label={[\arabic*]}]
+    \item Author A. \textit{Title of Reference}. Journal Name, 2024.
+    \item Author B. \textit{Another Reference}. Publisher, 2023.
+\end{enumerate}
+
+\end{document}

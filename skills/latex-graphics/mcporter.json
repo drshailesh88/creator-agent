@@ -1,0 +1,195 @@
+{
+  "name": "latex-graphics",
+  "version": "1.0.0",
+  "description": "Generate branded infographics, presentations, and documents using LaTeX/TikZ",
+  "tools": [
+    {
+      "name": "create_infographic",
+      "description": "Generate a branded infographic using TikZ. Supports medical, statistics, process flows, and more.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Main title of the infographic"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Subtitle or tagline"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["medical", "statistics", "process", "comparison", "timeline", "custom"],
+            "description": "Type of infographic to generate"
+          },
+          "content": {
+            "type": "object",
+            "description": "Content structure depending on type",
+            "properties": {
+              "stats": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "icon": { "type": "string" },
+                    "value": { "type": "string" },
+                    "label": { "type": "string" }
+                  }
+                }
+              },
+              "sections": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string" },
+                    "items": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "number": { "type": "integer" },
+                    "title": { "type": "string" },
+                    "description": { "type": "string" }
+                  }
+                }
+              },
+              "alert": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "items": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          },
+          "output_path": {
+            "type": "string",
+            "description": "Path to save the generated files"
+          },
+          "compile_pdf": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether to compile to PDF"
+          }
+        },
+        "required": ["title", "type", "content"]
+      }
+    },
+    {
+      "name": "create_presentation",
+      "description": "Generate a branded Beamer presentation",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Presentation title"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Presentation subtitle"
+          },
+          "author": {
+            "type": "string",
+            "description": "Author name"
+          },
+          "slides": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "type": {
+                  "type": "string",
+                  "enum": ["content", "stats", "bullets", "comparison", "quote"]
+                },
+                "content": { "type": "object" }
+              }
+            }
+          },
+          "output_path": {
+            "type": "string"
+          },
+          "compile_pdf": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": ["title", "slides"]
+      }
+    },
+    {
+      "name": "create_document",
+      "description": "Generate a branded document/article",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Document title"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "content": { "type": "string" },
+                "boxes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": ["info", "warning", "alert", "tip", "keypoint"]
+                      },
+                      "content": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "output_path": {
+            "type": "string"
+          },
+          "compile_pdf": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": ["title", "sections"]
+      }
+    },
+    {
+      "name": "compile_latex",
+      "description": "Compile a LaTeX file to PDF",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tex_file": {
+            "type": "string",
+            "description": "Path to the .tex file to compile"
+          },
+          "output_dir": {
+            "type": "string",
+            "description": "Output directory for PDF"
+          }
+        },
+        "required": ["tex_file"]
+      }
+    }
+  ]
+}

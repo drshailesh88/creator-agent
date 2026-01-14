@@ -1,0 +1,132 @@
+% DrShailesh Brand Colors - LaTeX Style Package
+% Usage: \usepackage{brand-colors}
+%
+% This package defines brand colors for consistent visual identity
+% across all LaTeX documents, infographics, and presentations.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{brand-colors}[2024/01/14 DrShailesh Brand Colors]
+
+\RequirePackage{xcolor}
+
+% =============================================================================
+% NEW BRANDING PALETTE (Primary - Use These)
+% =============================================================================
+
+% Primary Teal (Deep Calm) - Logos, titles, headers
+\definecolor{BrandPrimary}{HTML}{16697A}
+\definecolor{PrimaryTeal}{HTML}{16697A}
+
+% Secondary Teal (Panel BG) - Darker sections, risk/alert boxes
+\definecolor{BrandSecondary}{HTML}{218380}
+\definecolor{SecondaryTeal}{HTML}{218380}
+
+% Accent Coral (Callout / CTA) - Visual energy, buttons, highlights
+\definecolor{BrandAccent}{HTML}{EF5350}
+\definecolor{AccentCoral}{HTML}{EF5350}
+
+% Soft Aqua (Background wash) - Pale background depth
+\definecolor{BrandBackground}{HTML}{E8F5F4}
+\definecolor{SoftAqua}{HTML}{E8F5F4}
+
+% Neutral Gray-White (Cards / Containers) - Clean backgrounds
+\definecolor{BrandNeutral}{HTML}{F9FAFB}
+\definecolor{NeutralWhite}{HTML}{F9FAFB}
+
+% Text Gray (Body Copy) - Warm dark gray for legibility
+\definecolor{BrandText}{HTML}{2F3E46}
+\definecolor{TextGray}{HTML}{2F3E46}
+
+% Highlight Red (Emergency) - Alerts, "Call Ambulance Immediately"
+\definecolor{BrandAlert}{HTML}{E74C3C}
+\definecolor{HighlightRed}{HTML}{E74C3C}
+
+
+% =============================================================================
+% OLD BRANDING PALETTE (Legacy - For Reference)
+% =============================================================================
+
+% Deep Teal - Logos, titles, CTAs
+\definecolor{LegacyDeepTeal}{HTML}{207178}
+
+% Mist Aqua - Backgrounds
+\definecolor{LegacyMistAqua}{HTML}{E4F1EF}
+
+% Warm Coral - Icons, highlights
+\definecolor{LegacyWarmCoral}{HTML}{F28C81}
+
+% Off-White - Alternate backgrounds
+\definecolor{LegacyOffWhite}{HTML}{F8F9FA}
+
+% Charcoal - Text
+\definecolor{LegacyCharcoal}{HTML}{333333}
+
+% Heart Red - Heart-related emphasis
+\definecolor{LegacyHeartRed}{HTML}{E63946}
+
+
+% =============================================================================
+% SEMANTIC COLOR ALIASES (Use these for intent-based coloring)
+% =============================================================================
+
+% Headings and titles
+\colorlet{TitleColor}{BrandPrimary}
+\colorlet{SubtitleColor}{BrandSecondary}
+
+% Body text
+\colorlet{BodyText}{BrandText}
+
+% Backgrounds
+\colorlet{PageBackground}{BrandBackground}
+\colorlet{CardBackground}{BrandNeutral}
+\colorlet{PanelBackground}{BrandSecondary}
+
+% Interactive elements
+\colorlet{CTAColor}{BrandAccent}
+\colorlet{LinkColor}{BrandPrimary}
+\colorlet{HoverColor}{BrandSecondary}
+
+% Status colors
+\colorlet{SuccessColor}{BrandSecondary}
+\colorlet{WarningColor}{BrandAccent}
+\colorlet{ErrorColor}{BrandAlert}
+\colorlet{InfoColor}{BrandPrimary}
+
+% Chart colors (for data visualization)
+\colorlet{ChartPrimary}{BrandPrimary}
+\colorlet{ChartSecondary}{BrandSecondary}
+\colorlet{ChartAccent}{BrandAccent}
+\colorlet{ChartNeutral}{BrandText}
+
+
+% =============================================================================
+% GRADIENT HELPERS (for TikZ)
+% =============================================================================
+
+% Usage in TikZ: \fill[brand gradient] (0,0) rectangle (5,3);
+\pgfdeclarehorizontalshading{brandgradient}{100bp}{
+  color(0bp)=(BrandPrimary);
+  color(100bp)=(BrandSecondary)
+}
+
+
+% =============================================================================
+% CONVENIENCE COMMANDS
+% =============================================================================
+
+% Colored text shortcuts
+\newcommand{\primarytext}[1]{\textcolor{BrandPrimary}{#1}}
+\newcommand{\accenttext}[1]{\textcolor{BrandAccent}{#1}}
+\newcommand{\alerttext}[1]{\textcolor{BrandAlert}{#1}}
+
+% Highlighted box
+\newcommand{\brandbox}[1]{%
+  \colorbox{BrandBackground}{\textcolor{BrandText}{#1}}%
+}
+
+% Alert box
+\newcommand{\alertbox}[1]{%
+  \colorbox{BrandAlert!10}{\textcolor{BrandAlert}{#1}}%
+}
+
+\endinput
