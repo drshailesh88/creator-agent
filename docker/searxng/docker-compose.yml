@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    ports:
+      # Only bind to localhost for security - not exposed to public internet
+      - "127.0.0.1:8888:8080"
+    volumes:
+      - ./settings.yml:/etc/searxng/settings.yml:ro
+      - searxng-data:/etc/searxng
+    environment:
+      # Base URL for the instance
+      - SEARXNG_BASE_URL=http://localhost:8888/
+      # Secret key for session security (generate with: openssl rand -hex 32)
+      - SEARXNG_SECRET=${SEARXNG_SECRET:-change-me-to-random-secret-key}
+      # Disable debug mode in production
+      - SEARXNG_DEBUG=false
+    networks:
+      - searxng-net
+    # Resource limits to prevent runaway usage
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    # Security: run as non-root
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+
+  # Optional Redis cache for better performance
+  redis:
+    image: redis:alpine
+    container_name: searxng-redis
+    restart: unless-stopped
+    command: redis-server --save "" --appendonly no --maxmemory 64mb --maxmemory-policy allkeys-lru
+    networks:
+      - searxng-net
+    tmpfs:
+      - /data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 64M
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  searxng-net:
+    driver: bridge
+    internal: false
+
+volumes:
+  searxng-data:

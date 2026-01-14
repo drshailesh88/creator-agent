@@ -1,0 +1,313 @@
+# SearXNG Configuration
+# Documentation: https://docs.searxng.org/admin/settings/
+
+general:
+  # Debug mode - disable in production
+  debug: false
+  # Instance name shown in UI
+  instance_name: "Clawdbot Search"
+  # Privacy policy URL (optional)
+  privacypolicy_url: false
+  # Donation URL (optional)
+  donation_url: false
+  # Contact info (optional)
+  contact_url: false
+  # Enable metrics endpoint
+  enable_metrics: true
+
+search:
+  # Safe search: 0 = None, 1 = Moderate, 2 = Strict
+  safe_search: 0
+  # Default categories
+  default_categories:
+    - general
+  # Ban time for engines with errors (seconds)
+  ban_time_on_fail: 5
+  # Maximum ban time
+  max_ban_time_on_fail: 120
+  # Autocomplete backend
+  autocomplete: ""
+  # Default language
+  default_lang: "en"
+  # Supported languages
+  languages:
+    - all
+    - en
+    - es
+    - fr
+    - de
+    - zh
+    - ja
+    - ko
+    - pt
+    - ru
+
+server:
+  # Port to listen on (inside container)
+  port: 8080
+  # Bind address (inside container)
+  bind_address: "0.0.0.0"
+  # Base URL - set via environment variable SEARXNG_BASE_URL
+  # Secret key - set via environment variable SEARXNG_SECRET
+  # Limiter to prevent abuse
+  limiter: false  # Disable since we're localhost-only
+  # Image proxy for privacy
+  image_proxy: true
+  # HTTP protocol version
+  method: "GET"
+  # Default HTTP headers
+  default_http_headers:
+    X-Content-Type-Options: nosniff
+    X-Download-Options: noopen
+    X-Robots-Tag: noindex, nofollow
+    Referrer-Policy: no-referrer
+
+redis:
+  # Connect to Redis sidecar for caching
+  url: redis://redis:6379/0
+
+ui:
+  # Default theme
+  default_theme: simple
+  # Default locale
+  default_locale: en
+  # Query in title
+  query_in_title: true
+  # Infinite scroll
+  infinite_scroll: false
+  # Center alignment
+  center_alignment: false
+  # Results on new tab
+  results_on_new_tab: false
+  # Hotkeys enabled
+  hotkeys: default
+  # Theme options
+  theme_args:
+    simple_style: auto
+
+# Output formats configuration
+# CRITICAL: Enable JSON for API access
+outgoing:
+  # Request timeout
+  request_timeout: 6.0
+  # Max request timeout
+  max_request_timeout: 15.0
+  # User agent rotation
+  useragent_suffix: ""
+  # Pool connections
+  pool_connections: 100
+  # Pool max size
+  pool_maxsize: 20
+  # Enable HTTP/2
+  enable_http2: true
+
+# Result formats - ENABLE JSON FOR API
+result_proxy:
+  url: ""
+  key: ""
+
+# Enabled plugins
+enabled_plugins:
+  - 'Hash plugin'
+  - 'Self Information'
+  - 'Tracker URL remover'
+  - 'Ahmia blacklist'
+
+# Engine configurations
+engines:
+  # Google - Primary search engine
+  - name: google
+    engine: google
+    shortcut: g
+    disabled: false
+    timeout: 6.0
+    weight: 1.2
+
+  # Bing - Secondary search engine
+  - name: bing
+    engine: bing
+    shortcut: bi
+    disabled: false
+    timeout: 6.0
+    weight: 1.0
+
+  # DuckDuckGo - Privacy-focused
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    disabled: false
+    timeout: 6.0
+    weight: 1.0
+
+  # Brave Search - Privacy-focused (no API key needed for searxng)
+  - name: brave
+    engine: brave
+    shortcut: br
+    disabled: false
+    timeout: 6.0
+    weight: 1.0
+
+  # Qwant - European privacy search
+  - name: qwant
+    engine: qwant
+    shortcut: qw
+    disabled: false
+    timeout: 6.0
+    categories: [general, images, news]
+    weight: 0.8
+
+  # Wikipedia - Knowledge
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    disabled: false
+    timeout: 6.0
+    weight: 1.1
+    categories: [general]
+
+  # Wikidata
+  - name: wikidata
+    engine: wikidata
+    shortcut: wd
+    disabled: false
+    timeout: 6.0
+
+  # GitHub - Code search
+  - name: github
+    engine: github
+    shortcut: gh
+    disabled: false
+    timeout: 6.0
+    categories: [it]
+
+  # Stack Overflow - Programming Q&A
+  - name: stackoverflow
+    engine: stackoverflow
+    shortcut: st
+    disabled: false
+    timeout: 6.0
+    categories: [it]
+
+  # Reddit
+  - name: reddit
+    engine: reddit
+    shortcut: re
+    disabled: false
+    timeout: 6.0
+    categories: [social media]
+
+  # arXiv - Academic papers
+  - name: arxiv
+    engine: arxiv
+    shortcut: ar
+    disabled: false
+    timeout: 10.0
+    categories: [science]
+
+  # Semantic Scholar - Academic search
+  - name: semantic scholar
+    engine: semantic_scholar
+    shortcut: ss
+    disabled: false
+    timeout: 6.0
+    categories: [science]
+
+  # Google Scholar
+  - name: google scholar
+    engine: google_scholar
+    shortcut: gs
+    disabled: false
+    timeout: 6.0
+    categories: [science]
+
+  # PubMed - Medical literature
+  - name: pubmed
+    engine: pubmed
+    shortcut: pm
+    disabled: false
+    timeout: 6.0
+    categories: [science]
+
+  # Hacker News
+  - name: hackernews
+    engine: hackernews
+    shortcut: hn
+    disabled: false
+    timeout: 6.0
+    categories: [it, news]
+
+  # YouTube
+  - name: youtube
+    engine: youtube_noapi
+    shortcut: yt
+    disabled: false
+    timeout: 6.0
+    categories: [videos]
+
+  # Vimeo
+  - name: vimeo
+    engine: vimeo
+    shortcut: vm
+    disabled: false
+    timeout: 6.0
+    categories: [videos]
+
+  # Image search engines
+  - name: google images
+    engine: google_images
+    shortcut: goi
+    disabled: false
+    timeout: 6.0
+    categories: [images]
+
+  - name: bing images
+    engine: bing_images
+    shortcut: bii
+    disabled: false
+    timeout: 6.0
+    categories: [images]
+
+  # News engines
+  - name: google news
+    engine: google_news
+    shortcut: gon
+    disabled: false
+    timeout: 6.0
+    categories: [news]
+
+  - name: bing news
+    engine: bing_news
+    shortcut: bin
+    disabled: false
+    timeout: 6.0
+    categories: [news]
+
+  # Currency/Finance
+  - name: currency
+    engine: currency_convert
+    shortcut: cc
+    disabled: false
+
+  # Dictionary
+  - name: wordnik
+    engine: wordnik
+    shortcut: wn
+    disabled: false
+    categories: [general]
+
+# Categories
+categories_as_tabs:
+  general:
+  images:
+  videos:
+  news:
+  science:
+  it:
+  files:
+
+# Formats configuration - ENABLE JSON API
+formats:
+  - html
+  - json
+  - csv
+  - rss

@@ -1,0 +1,157 @@
+% =============================================================================
+% LaTeX Installation Test
+% =============================================================================
+% This file tests that all required packages for the DrShailesh graphics
+% system are properly installed.
+%
+% Compile with: pdflatex test-installation.tex
+%
+% If compilation succeeds, your LaTeX installation is ready!
+% =============================================================================
+
+\documentclass[tikz,border=20pt]{standalone}
+
+% Test: inputenc and fontenc
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Test: xcolor (required for brand-colors)
+\usepackage{xcolor}
+
+% Test: TikZ and libraries
+\usepackage{tikz}
+\usetikzlibrary{
+    shapes.geometric,
+    shapes.symbols,
+    arrows.meta,
+    positioning,
+    calc,
+    fit,
+    backgrounds,
+    shadows.blur,
+    decorations.pathreplacing,
+    patterns
+}
+
+% Test: fontawesome5
+\usepackage{fontawesome5}
+
+% Test: Brand colors (our custom package)
+\usepackage{brand-colors}
+
+% Test: calc package
+\usepackage{calc}
+
+% =============================================================================
+% BEGIN DOCUMENT
+% =============================================================================
+
+\begin{document}
+\begin{tikzpicture}[
+    remember picture,
+    box/.style={
+        rectangle,
+        rounded corners=8pt,
+        draw=#1,
+        fill=#1!10,
+        line width=1.5pt,
+        minimum width=180pt,
+        minimum height=40pt,
+        font=\sffamily\bfseries,
+        text=#1
+    }
+]
+
+% Background
+\fill[BrandBackground] (-1,-1) rectangle (14,12);
+
+% Title
+\node[font=\sffamily\bfseries\Huge, text=BrandPrimary] at (6.5,11) {LaTeX Installation Test};
+\node[font=\sffamily, text=BrandText] at (6.5,10.2) {DrShailesh Graphics System};
+
+% Divider line
+\draw[BrandPrimary, line width=2pt] (1,9.5) -- (12,9.5);
+
+% Test results section
+\node[font=\sffamily\bfseries\large, text=BrandSecondary, anchor=west] at (0,8.5) {Package Tests:};
+
+% Test 1: TikZ
+\node[box=BrandSecondary] (tikz) at (3.5,7) {\faCheckCircle\quad TikZ Working};
+
+% Test 2: Brand Colors
+\node[box=BrandPrimary] (colors) at (9.5,7) {\faCheckCircle\quad Brand Colors Loaded};
+
+% Test 3: FontAwesome5
+\node[box=BrandAccent] (fa) at (3.5,5.5) {\faCheckCircle\quad FontAwesome5 Working};
+
+% Test 4: Shadows
+\node[
+    rectangle,
+    rounded corners=8pt,
+    draw=BrandSecondary,
+    fill=BrandNeutral,
+    line width=1.5pt,
+    minimum width=180pt,
+    minimum height=40pt,
+    font=\sffamily\bfseries,
+    text=BrandSecondary,
+    blur shadow={shadow blur steps=5, shadow xshift=2pt, shadow yshift=-2pt}
+] (shadow) at (9.5,5.5) {\faCheckCircle\quad Shadows Working};
+
+% Color swatches
+\node[font=\sffamily\bfseries, text=BrandSecondary, anchor=west] at (0,4) {Brand Color Palette:};
+
+% Swatch row 1
+\fill[BrandPrimary] (0.5,3) rectangle (2,3.5);
+\node[font=\sffamily\tiny, text=BrandText, anchor=west] at (2.2,3.25) {Primary};
+
+\fill[BrandSecondary] (4,3) rectangle (5.5,3.5);
+\node[font=\sffamily\tiny, text=BrandText, anchor=west] at (5.7,3.25) {Secondary};
+
+\fill[BrandAccent] (7.5,3) rectangle (9,3.5);
+\node[font=\sffamily\tiny, text=BrandText, anchor=west] at (9.2,3.25) {Accent};
+
+\fill[BrandAlert] (11,3) rectangle (12.5,3.5);
+\node[font=\sffamily\tiny, text=BrandText, anchor=west] at (12.7,3.25) {Alert};
+
+% Swatch row 2
+\fill[BrandBackground] (0.5,2.2) rectangle (2,2.7);
+\draw[BrandText!30] (0.5,2.2) rectangle (2,2.7);
+\node[font=\sffamily\tiny, text=BrandText, anchor=west] at (2.2,2.45) {Background};
+
+\fill[BrandNeutral] (4,2.2) rectangle (5.5,2.7);
+\draw[BrandText!30] (4,2.2) rectangle (5.5,2.7);
+\node[font=\sffamily\tiny, text=BrandText, anchor=west] at (5.7,2.45) {Neutral};
+
+\fill[BrandText] (7.5,2.2) rectangle (9,2.7);
+\node[font=\sffamily\tiny, text=BrandText, anchor=west] at (9.2,2.45) {Text};
+
+% Icon test
+\node[font=\sffamily\bfseries, text=BrandSecondary, anchor=west] at (0,1.2) {FontAwesome5 Icons:};
+
+\node[text=BrandPrimary, font=\Large] at (1,0.4) {\faHeart};
+\node[text=BrandSecondary, font=\Large] at (2.5,0.4) {\faCheckCircle};
+\node[text=BrandAccent, font=\Large] at (4,0.4) {\faStar};
+\node[text=BrandAlert, font=\Large] at (5.5,0.4) {\faExclamationTriangle};
+\node[text=BrandPrimary, font=\Large] at (7,0.4) {\faBrain};
+\node[text=BrandSecondary, font=\Large] at (8.5,0.4) {\faHeartbeat};
+\node[text=BrandAccent, font=\Large] at (10,0.4) {\faLightbulb};
+\node[text=BrandText, font=\Large] at (11.5,0.4) {\faUser};
+
+% Success message
+\node[
+    rectangle,
+    rounded corners=10pt,
+    fill=BrandSecondary,
+    text=white,
+    font=\sffamily\bfseries\large,
+    minimum width=280pt,
+    minimum height=50pt,
+    blur shadow={shadow blur steps=5, shadow xshift=3pt, shadow yshift=-3pt, shadow opacity=0.3}
+] at (6.5,-1) {\faCheckDouble\quad Installation Successful!};
+
+% Footer
+\node[font=\sffamily\tiny, text=BrandText!50] at (6.5,-2.2) {If you can see this PDF, your LaTeX installation is ready for the DrShailesh graphics system.};
+
+\end{tikzpicture}
+\end{document}

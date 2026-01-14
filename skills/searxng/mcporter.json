@@ -1,0 +1,231 @@
+{
+  "$schema": "https://mcphub.io/schemas/mcporter.v1.json",
+  "name": "searxng-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for SearXNG self-hosted search integration",
+
+  "server": {
+    "command": "python",
+    "args": ["./search.py", "--serve"],
+    "env": {
+      "SEARXNG_URL": "${SEARXNG_URL:-http://localhost:8888}",
+      "SEARXNG_TIMEOUT": "${SEARXNG_TIMEOUT:-10}",
+      "LOG_LEVEL": "${LOG_LEVEL:-info}"
+    }
+  },
+
+  "tools": [
+    {
+      "name": "searxng_search",
+      "description": "Search the web using SearXNG metasearch engine. Returns structured results from multiple search engines without API key requirements.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The search query string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["general", "images", "videos", "news", "science", "it", "files"]
+            },
+            "description": "Categories to search in. Default: ['general']",
+            "default": ["general"]
+          },
+          "engines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Specific engines to use (e.g., ['google', 'bing', 'duckduckgo']). If empty, uses all enabled engines.",
+            "default": []
+          },
+          "language": {
+            "type": "string",
+            "description": "Language code for results (e.g., 'en', 'es', 'fr'). Default: 'en'",
+            "default": "en"
+          },
+          "safe_search": {
+            "type": "integer",
+            "enum": [0, 1, 2],
+            "description": "Safe search level: 0=off, 1=moderate, 2=strict. Default: 0",
+            "default": 0
+          },
+          "time_range": {
+            "type": "string",
+            "enum": ["", "day", "week", "month", "year"],
+            "description": "Time range filter for results. Default: '' (any time)",
+            "default": ""
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Maximum number of results to return. Default: 20",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "searxng_research",
+      "description": "Perform deep research on a topic by running multiple related queries and aggregating results. Good for comprehensive information gathering.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "The main topic to research"
+          },
+          "depth": {
+            "type": "string",
+            "enum": ["basic", "thorough", "comprehensive"],
+            "description": "Research depth: basic (1 query), thorough (3 queries), comprehensive (5+ queries). Default: 'thorough'",
+            "default": "thorough"
+          },
+          "focus_areas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Specific aspects to focus on (e.g., ['technical', 'business', 'recent news'])",
+            "default": []
+          },
+          "include_academic": {
+            "type": "boolean",
+            "description": "Include academic/scientific sources. Default: false",
+            "default": false
+          }
+        },
+        "required": ["topic"]
+      }
+    },
+    {
+      "name": "searxng_autocomplete",
+      "description": "Get search suggestions/autocomplete for a partial query",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Partial query to get suggestions for"
+          }
+        },
+        "required": ["query"]
+      }
+    }
+  ],
+
+  "resources": [
+    {
+      "name": "searxng_engines",
+      "description": "List of available search engines and their status",
+      "uriTemplate": "searxng://engines",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "searxng_categories",
+      "description": "List of available search categories",
+      "uriTemplate": "searxng://categories",
+      "mimeType": "application/json"
+    }
+  ],
+
+  "prompts": [
+    {
+      "name": "web_search",
+      "description": "Search the web for information",
+      "arguments": [
+        {
+          "name": "query",
+          "description": "What to search for",
+          "required": true
+        },
+        {
+          "name": "context",
+          "description": "Additional context about why you're searching",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "research_topic",
+      "description": "Comprehensive research on a topic",
+      "arguments": [
+        {
+          "name": "topic",
+          "description": "The topic to research",
+          "required": true
+        },
+        {
+          "name": "depth",
+          "description": "How deep to research (basic/thorough/comprehensive)",
+          "required": false
+        }
+      ]
+    }
+  ],
+
+  "personality": {
+    "_comment": "CRITICAL: These settings ensure Clawdbot's personality is preserved",
+    "preserveSoulMd": true,
+    "allowPersonalityOverride": false,
+    "responseStyle": {
+      "maintainWarmth": true,
+      "useClawdbotVoice": true,
+      "friendlyErrorMessages": true
+    }
+  },
+
+  "clawdbotIntegration": {
+    "triggers": {
+      "commands": ["/search", "/research", "/lookup"],
+      "keywords": [
+        "search for",
+        "look up",
+        "find information",
+        "what's the latest",
+        "search the web",
+        "google",
+        "research"
+      ],
+      "patterns": [
+        "search\\s+(?:for\\s+)?(.+)",
+        "look\\s+up\\s+(.+)",
+        "find\\s+(?:info|information)\\s+(?:on|about)\\s+(.+)"
+      ]
+    },
+    "priority": 60,
+    "fallbackToDefault": true
+  },
+
+  "healthCheck": {
+    "endpoint": "/healthz",
+    "interval": 30000,
+    "timeout": 5000
+  },
+
+  "rateLimit": {
+    "requests": 30,
+    "window": 60000,
+    "_comment": "30 requests per minute to avoid overwhelming search engines"
+  },
+
+  "logging": {
+    "level": "info",
+    "includeTimestamps": true,
+    "redactSecrets": true
+  },
+
+  "metadata": {
+    "author": "Life OS",
+    "repository": "https://github.com/searxng/searxng",
+    "documentation": "https://docs.searxng.org/",
+    "license": "AGPL-3.0",
+    "tags": ["search", "research", "privacy", "metasearch"],
+    "personalitySafe": true
+  }
+}
